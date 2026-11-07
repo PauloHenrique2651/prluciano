@@ -154,7 +154,14 @@ export function CountUp({ to, from = 0, duration = 1.6, className }) {
       if (k < 1) raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    // Safety net: if frames are paused (background tab, battery saver), still show the real number.
+    const done = setTimeout(() => {
+      if (ref.current) ref.current.textContent = String(to);
+    }, duration * 1000 + 400);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(done);
+    };
   }, [inView, to, from, duration, reduce]);
   return (
     <span ref={ref} className={className} aria-label={String(to)}>

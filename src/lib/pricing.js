@@ -1,33 +1,56 @@
 // Prices from the Eternal Eleven "Programa de Reclutamiento Universitario y Becas Deportivas" sheet (USD).
+// Plans are cumulative: each one builds on the one before it.
 export const PLANS = [
   {
     key: "basic",
     name: "Basic College Pathway",
+    short: "Basic",
+    outcome: "Get the athlete's record ready",
     price: 115,
     period: "/month",
     text: "Sports profile, résumé and initial guidance.",
+    features: ["Athletic profile", "Academic and athletic résumé", "Initial college guidance"],
   },
   {
     key: "college-recruitment",
     name: "College Recruitment",
+    short: "College Recruitment",
+    outcome: "Get in front of college coaches",
     price: 195,
     period: "/month",
     recommended: true,
     text: "University search, contact with coaches, follow-up and a recommendation letter.",
     note: "6-month initial term · US$1,170 total",
+    plus: "Everything in Basic, plus",
+    features: [
+      "Universities matched to academic and athletic level",
+      "Contact with college coaches and follow-up",
+      "Recommendation letter",
+      "Monthly meeting with the athlete and family",
+      "Monthly report of contacts, replies and opportunities",
+    ],
   },
   {
     key: "premium-scholarship",
     name: "Premium Scholarship",
+    short: "Premium",
+    outcome: "Go after scholarships",
     price: 295,
     period: "/month",
     text: "Full guidance, applications and scholarship search.",
+    plus: "Everything in College Recruitment, plus",
+    features: ["Full guidance through the process", "Help preparing university applications", "Academic and athletic scholarship search"],
   },
   {
     key: "full-recruitment",
     name: "Full Recruitment",
+    short: "Full",
+    outcome: "Hand us the whole process",
     priceLabel: "US$1,500–3,000",
+    priceSub: "based on the scope of the process",
     text: "Personalized support throughout the entire process.",
+    plus: "Everything in Premium, with",
+    features: ["Personalized one-to-one support", "Accompaniment from first contact to decision"],
   },
 ];
 
@@ -43,6 +66,25 @@ export const RECOMMENDED_INCLUDES = [
 
 export const PRICING_TERMS =
   "Exam fees, university application fees, travel and video production may be charged separately. The agency provides guidance and support; it does not guarantee university admission, coach offers or scholarships. Prices are commercial proposals and may be adjusted to the scope of the service.";
+
+export const PRICING_FAQ = [
+  {
+    q: "Which plan should we start with?",
+    a: "We recommend College Recruitment for most athletes: it covers the profile, the university search and direct contact with coaches. If the athlete's record isn't ready yet, Basic gets it there first. Send an application and we'll tell you which plan fits.",
+  },
+  {
+    q: "Do you guarantee a scholarship or admission?",
+    a: "No. We provide guidance and support and make the athlete a credible candidate. Admission, coach offers and scholarships are decided by the universities.",
+  },
+  {
+    q: "What isn't included in the price?",
+    a: "Exam fees, university application fees, travel and video production may be charged separately. We tell you about any of these before they apply.",
+  },
+  {
+    q: "When do we pay?",
+    a: "After we read your application and explain what the plan involves for your athlete. Nothing is paid before that.",
+  },
+];
 
 // Achievements from the sample record (Grade 5 athlete), grouped two years at a time, newest first.
 export const RECORD_TIMELINE = [

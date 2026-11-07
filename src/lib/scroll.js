@@ -8,16 +8,27 @@ export function getLenis() {
   return lenis;
 }
 
+const OFFSET = -76;
+
+// Instant jumps set the native scroll position and keep Lenis in sync, so they work even
+// when animation frames are paused (background tabs, slow phones).
+function jump(y) {
+  window.scrollTo(0, y);
+  if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
+}
+
 export function scrollToHash(hash, immediate = false) {
   const el = hash && document.getElementById(hash.replace("#", ""));
   if (!el) return false;
-  const offset = -76;
-  if (lenis) lenis.scrollTo(el, { offset, immediate, duration: 1.4 });
-  else window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY + offset, behavior: immediate ? "auto" : "smooth" });
+  if (immediate) {
+    jump(Math.max(0, el.getBoundingClientRect().top + window.scrollY + OFFSET));
+    return true;
+  }
+  if (lenis) lenis.scrollTo(el, { offset: OFFSET, duration: 1.4 });
+  else window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY + OFFSET, behavior: "smooth" });
   return true;
 }
 
 export function scrollTop() {
-  if (lenis) lenis.scrollTo(0, { immediate: true });
-  else window.scrollTo(0, 0);
+  jump(0);
 }

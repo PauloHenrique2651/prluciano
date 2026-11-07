@@ -90,14 +90,35 @@ export default function App() {
 
   // Route change: scroll to hash or top, and move focus to main for screen readers.
   useEffect(() => {
-    const t = setTimeout(() => {
-      if (location.hash) {
-        if (!scrollToHash(location.hash, true)) window.scrollTo(0, 0);
-      } else {
-        scrollTop();
+    let tries = 0;
+    let t;
+    // Wait for the outgoing page to leave (exit animation), then land on the requested section.
+    const land = () => {
+      const target = location.hash && document.getElementById(location.hash.slice(1));
+      const oldPageGone = document.querySelectorAll("main > div").length <= 1;
+      if (location.hash && (!target || !oldPageGone) && tries++ < 20) {
+        t = setTimeout(land, 100);
+        return;
       }
+      if (target) {
+        // Layout can still grow just after mount; re-check a few times and correct,
+        // unless the visitor starts scrolling on their own.
+        let userMoved = false;
+        const stop = () => (userMoved = true);
+        window.addEventListener("wheel", stop, { once: true, passive: true });
+        window.addEventListener("touchstart", stop, { once: true, passive: true });
+        let checks = 0;
+        const settle = () => {
+          if (userMoved) return;
+          const off = Math.abs(target.getBoundingClientRect().top - 76);
+          if (off > 4) scrollToHash(location.hash, true);
+          if (checks++ < 8) t = setTimeout(settle, 250);
+        };
+        settle();
+      } else scrollTop();
       document.getElementById("main")?.focus({ preventScroll: true });
-    }, 360);
+    };
+    t = setTimeout(land, 360);
     return () => clearTimeout(t);
   }, [location.pathname, location.hash]);
 
