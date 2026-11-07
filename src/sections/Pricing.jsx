@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { Check, Info, Star, WhatsappLogo, ShieldCheck, Trophy, Plus, ArrowRight, Minus, CaretDown, Tag } from "@phosphor-icons/react";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, animate, motion, useMotionValue, useMotionValueEvent, useSpring, useTransform } from "framer-motion";
+import { IS_TOUCH } from "../lib/device.js";
+import { useNavigate } from "react-router-dom";
+import { Check, Info, Star, WhatsappLogo, ShieldCheck, Trophy, Plus, ArrowRight, Minus, CaretDown, Tag, Scissors } from "@phosphor-icons/react";
 import { PLANS, PRICING_TERMS, PRICING_FAQ, PLAN_COMPARE, START_STEPS, planPriceText } from "../lib/pricing.js";
 import { waLink } from "../lib/site.js";
 import { CountUp, RevealLines, Reveal, ScrollIcon, SmartLink, Stagger, EASE } from "../components/ui.jsx";
@@ -10,6 +12,95 @@ const perDay = (p) => ((p.price * 12) / 365).toFixed(2);
 const priceText = planPriceText;
 const ctaClass = (p) => (p.promo ? "cta-night" : p.recommended ? "btn-gold" : "cta-chalk");
 const PROMO = PLANS.find((p) => p.promo);
+const CUT_EASE = [0.65, 0, 0.35, 1];
+
+/** Perforation the visitor cuts with a finger or the mouse. The scissors follow on a spring;
+ *  pressing anywhere on the perforation and sliding cuts it. Tap / Enter on the scissors cuts it in one go. */
+function TicketCut({ progress, onCut }) {
+  const track = useRef(null);
+  const [touched, setTouched] = useState(false);
+  const [done, setDone] = useState(false);
+  const drag = useRef({ on: false, moved: 0, startX: 0 });
+  const target = useMotionValue(0);
+  const x = useSpring(target, { stiffness: 520, damping: 42, mass: 0.6 });
+  const snip = useTransform(x, (v) => Math.sin(v / 6) * 18);
+  const hint = useTransform(x, [0, 24], [1, 0]);
+  const width = () => track.current?.offsetWidth || 1;
+
+  useMotionValueEvent(x, "change", (v) => progress.set(Math.min(1, Math.max(0, v / width()))));
+
+  const finish = () => {
+    if (done) return;
+    setTouched(true);
+    setDone(true);
+    target.set(width());
+    onCut?.();
+  };
+  const follow = (e) => {
+    const r = track.current.getBoundingClientRect();
+    // the cut only moves forward, like real scissors
+    target.set(Math.max(target.get(), Math.min(r.width, Math.max(0, e.clientX - r.left))));
+  };
+  const down = (e) => {
+    if (done) return;
+    drag.current = { on: true, moved: 0, startX: e.clientX };
+    setTouched(true);
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {}
+  };
+  const move = (e) => {
+    if (!drag.current.on) return;
+    drag.current.moved = Math.max(drag.current.moved, Math.abs(e.clientX - drag.current.startX));
+    if (drag.current.moved > 3) follow(e);
+  };
+  const up = () => {
+    if (!drag.current.on) return;
+    drag.current.on = false;
+    if (drag.current.moved <= 3) return; // a tap: handled by the button's click
+    if (target.get() / width() > 0.7) finish();
+    else target.set(0);
+  };
+
+  return (
+    <div
+      className={`tcut ${done ? "is-done" : ""}`}
+      ref={track}
+      onPointerDown={down}
+      onPointerMove={move}
+      onPointerUp={up}
+      onPointerCancel={up}
+    >
+      <span className="tcut-dots" aria-hidden="true" />
+      <motion.span className="tcut-line" style={{ scaleX: progress }} aria-hidden="true" />
+      {!done && (
+        <motion.span className="tcut-hint" style={{ opacity: hint }} aria-hidden="true">
+          {IS_TOUCH ? "Slide to cut and apply" : "Drag to cut and apply"}
+        </motion.span>
+      )}
+      <motion.button
+        type="button"
+        className="tcut-scissors"
+        aria-label="Cut the ticket and open the application"
+        disabled={done}
+        style={{ x }}
+        onClick={() => {
+          if (drag.current.moved <= 3) finish();
+        }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.92 }}
+      >
+        <motion.span
+          style={{ display: "grid", rotate: snip }}
+          animate={touched ? { x: 0 } : { x: [0, 12, 0] }}
+          transition={touched ? { duration: 0.2 } : { duration: 1.1, repeat: Infinity, repeatDelay: 1.2, ease: "easeInOut" }}
+        >
+          <Scissors size={18} weight="fill" aria-hidden="true" />
+        </motion.span>
+      </motion.button>
+    </div>
+  );
+}
 
 /** Phones: while the plans are on screen but the offer card's button isn't, keep the offer one tap away. */
 function OfferBar() {
@@ -63,6 +154,151 @@ function OfferBar() {
   );
 }
 
+/** The plan tickets, shared by the home page and the recruitment page.
+ *  Cutting a ticket splits it in two, then opens the application with that plan already chosen. */
+export function PlanGrid({ markPromo = false }) {
+  return (
+    <Stagger className="plan-grid" gap={0.1}>
+      {PLANS.map((p, i) => (
+        <PlanCard key={p.key} p={p} i={i} markPromo={markPromo} />
+      ))}
+    </Stagger>
+  );
+}
+
+/** One plan ticket in two pieces: the body and the stub, joined by the perforation. */
+function PlanCard({ p, i, markPromo }) {
+  const navigate = useNavigate();
+  const [torn, setTorn] = useState(false);
+  const cut = useMotionValue(0); // 0 → 1 while cutting
+  const split = useMotionValue(0); // 0 → 1 as the pieces come apart
+  // While cutting, the stub already starts to give way; after the cut it drops away.
+  const stubY = useTransform([cut, split], ([c, s]) => c * 4 + s * 46);
+  const stubX = useTransform(split, [0, 1], [0, 12]);
+  const stubR = useTransform([cut, split], ([c, s]) => c * 0.9 + s * 4.5);
+  const bodyY = useTransform(split, [0, 1], [0, -10]);
+  const bodyR = useTransform(split, [0, 1], [0, -1.4]);
+
+  const tear = () => {
+    setTorn(true);
+    animate(split, 1, { type: "spring", stiffness: 110, damping: 13, mass: 0.9 });
+    setTimeout(() => navigate(applyHref(p.key) + "#apply-title"), 1150);
+  };
+
+  return (
+        <Stagger.Item
+          as="article"
+          className={`plan ${p.recommended ? "is-recommended" : ""} ${p.promo ? "has-promo" : ""} ${torn ? "is-torn" : ""}`}
+          aria-labelledby={`plan-${p.key}`}
+        >
+          <motion.div className="plan-body" style={{ y: bodyY, rotate: bodyR }}>
+            <div className="plan-ticket-head" aria-hidden="true">
+              <span className="tk-mark">11</span>
+              <span>College pathway pass</span>
+              <span className="tk-no num">{String(i + 1).padStart(2, "0")}</span>
+            </div>
+            <div className="plan-top">
+              <div className="plan-level" role="img" aria-label={`Level ${i + 1} of ${PLANS.length}`}>
+                {PLANS.map((_, s) => (
+                  <motion.span
+                    key={s}
+                    className={s <= i ? "on" : ""}
+                    initial={{ scaleX: 0 }}
+                    whileInView={{ scaleX: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, ease: EASE, delay: 0.3 + s * 0.12 }}
+                  />
+                ))}
+              </div>
+              {p.recommended && (
+                <span className="plan-badge">
+                  <Star size={14} weight="fill" aria-hidden="true" /> Recommended
+                </span>
+              )}
+              {p.promo && (
+                <span className="plan-badge plan-badge-promo">
+                  <Tag size={14} weight="fill" aria-hidden="true" /> {p.promo.label}
+                </span>
+              )}
+            </div>
+
+            <h3 id={`plan-${p.key}`} className="plan-head">
+              <span className="plan-outcome">{p.outcome}</span>
+              <span className="plan-name">{p.name}</span>
+            </h3>
+
+            <div className="plan-price-block">
+              {p.was && (
+                <p className="plan-was">
+                  <s aria-label={`Regular price US$${p.was} a month`}>US${p.was}</s>
+                  <span className="plan-off">{p.promo.off}</span>
+                </p>
+              )}
+              <p className="plan-price">
+                {p.price ? (
+                  <>
+                    <span className="plan-currency">US$</span>
+                    <CountUp className="num" from={0} to={p.price} duration={1.4} />
+                    <span className="plan-period">{p.period}</span>
+                  </>
+                ) : (
+                  <span className="num plan-range">{p.priceLabel}</span>
+                )}
+              </p>
+              {p.price && <p className="plan-daily">About US${perDay(p)} a day</p>}
+              {(p.note || p.priceSub) && <p className="plan-note">{p.note || p.priceSub}</p>}
+            </div>
+
+            <div className="plan-features">
+              {p.plus && <p className="plan-plus">{p.plus}</p>}
+              <ul>
+                {p.features.map((f) => (
+                  <li key={f}>
+                    <Check size={16} weight="bold" aria-hidden="true" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </motion.div>
+
+          <div className="plan-seam">
+            <TicketCut progress={cut} onCut={tear} />
+          </div>
+
+          <motion.div className="plan-stub" id={p.promo && markPromo ? "promo-stub" : undefined} style={{ x: stubX, y: stubY, rotate: stubR }}>
+            {p.promo && (
+              <p className="plan-code">
+                <span>Your code</span>
+                <b translate="no">{p.promo.code}</b>
+                <span>Applied automatically</span>
+              </p>
+            )}
+            <SmartLink to={applyHref(p.key)} className={`btn plan-cta ${ctaClass(p)}`}>
+              <span>{p.cta}</span>
+              <span className="cta-arrow" aria-hidden="true">
+                <ArrowRight size={18} weight="bold" />
+              </span>
+            </SmartLink>
+            <p className="plan-risk">Free first conversation. You only pay once you agree with the plan.</p>
+            <a
+              className="plan-wa"
+              href={waLink(`Hello! I'm interested in the ${p.name} plan, ${priceText(p)}, for my athlete. Could you tell me more?`)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <WhatsappLogo size={18} weight="fill" aria-hidden="true" />
+              Ask about this plan on WhatsApp
+            </a>
+            <div className="plan-barcode" aria-hidden="true">
+              <span />
+              <small>Valid for one student-athlete</small>
+            </div>
+          </motion.div>
+        </Stagger.Item>
+  );
+}
+
 /** Recruitment plans laid out to convert: outcome-led cards, the recommended plan raised in gold, two ways to act on each. */
 export default function Pricing({ id = "plans" }) {
   return (
@@ -94,113 +330,7 @@ export default function Pricing({ id = "plans" }) {
           </Stagger.Item>
         </Stagger>
 
-        <Stagger className="plan-grid" gap={0.1}>
-          {PLANS.map((p, i) => (
-            <Stagger.Item
-              as="article"
-              key={p.key}
-              className={`plan ${p.recommended ? "is-recommended" : ""} ${p.promo ? "has-promo" : ""}`}
-              aria-labelledby={`plan-${p.key}`}
-            >
-              <div className="plan-body">
-                <div className="plan-top">
-                  <div className="plan-level" role="img" aria-label={`Level ${i + 1} of ${PLANS.length}`}>
-                    {PLANS.map((_, s) => (
-                      <motion.span
-                        key={s}
-                        className={s <= i ? "on" : ""}
-                        initial={{ scaleX: 0 }}
-                        whileInView={{ scaleX: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, ease: EASE, delay: 0.3 + s * 0.12 }}
-                      />
-                    ))}
-                  </div>
-                  {p.recommended && (
-                    <span className="plan-badge">
-                      <Star size={14} weight="fill" aria-hidden="true" /> Recommended
-                    </span>
-                  )}
-                  {p.promo && (
-                    <span className="plan-badge plan-badge-promo">
-                      <Tag size={14} weight="fill" aria-hidden="true" /> {p.promo.label}
-                    </span>
-                  )}
-                </div>
-
-                <h3 id={`plan-${p.key}`} className="plan-head">
-                  <span className="plan-outcome">{p.outcome}</span>
-                  <span className="plan-name">{p.name}</span>
-                </h3>
-
-                <div className="plan-price-block">
-                  {p.was && (
-                    <p className="plan-was">
-                      <s aria-label={`Regular price US$${p.was} a month`}>US${p.was}</s>
-                      <span className="plan-off">{p.promo.off}</span>
-                    </p>
-                  )}
-                  <p className="plan-price">
-                    {p.price ? (
-                      <>
-                        <span className="plan-currency">US$</span>
-                        <CountUp className="num" from={0} to={p.price} duration={1.4} />
-                        <span className="plan-period">{p.period}</span>
-                      </>
-                    ) : (
-                      <span className="num plan-range">{p.priceLabel}</span>
-                    )}
-                  </p>
-                  {p.price && <p className="plan-daily">About US${perDay(p)} a day</p>}
-                  {(p.note || p.priceSub) && <p className="plan-note">{p.note || p.priceSub}</p>}
-                </div>
-
-                <div className="plan-features">
-                  {p.plus && <p className="plan-plus">{p.plus}</p>}
-                  <ul>
-                    {p.features.map((f) => (
-                      <li key={f}>
-                        <Check size={16} weight="bold" aria-hidden="true" />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              <div className="plan-stub" id={p.promo ? "promo-stub" : undefined}>
-                <span className="plan-perf" aria-hidden="true" />
-                {p.promo && (
-                  <p className="plan-code">
-                    <span>Your code</span>
-                    <b translate="no">{p.promo.code}</b>
-                    <span>Applied automatically</span>
-                  </p>
-                )}
-                <SmartLink to={applyHref(p.key)} className={`btn plan-cta ${ctaClass(p)}`}>
-                  <span>{p.cta}</span>
-                  <span className="cta-arrow" aria-hidden="true">
-                    <ArrowRight size={18} weight="bold" />
-                  </span>
-                </SmartLink>
-                <p className="plan-risk">Free first conversation. You only pay once you agree with the plan.</p>
-                <a
-                  className="plan-wa"
-                  href={waLink(`Hello! I'm interested in the ${p.name} plan, ${priceText(p)}, for my athlete. Could you tell me more?`)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <WhatsappLogo size={18} weight="fill" aria-hidden="true" />
-                  Ask about this plan on WhatsApp
-                </a>
-                <div className="plan-barcode" aria-hidden="true">
-                  <span />
-                  <small>Pass {i + 1} of {PLANS.length}</small>
-                </div>
-              </div>
-            </Stagger.Item>
-          ))}
-        </Stagger>
+        <PlanGrid markPromo />
 
         <OfferBar />
 
@@ -343,7 +473,7 @@ function PricingFaq() {
   );
 }
 
-/** Compact price strip for the home page: every plan at a glance, recommended in gold, one click to compare. */
+/** Home page: the same plan tickets as the recruitment page, under a short heading. */
 export function PlanStrip() {
   return (
     <section className="section-tight plan-strip-section" aria-label="Recruitment plans">
@@ -358,30 +488,7 @@ export function PlanStrip() {
             <ArrowRight size={18} weight="bold" aria-hidden="true" />
           </SmartLink>
         </div>
-        <Stagger className="plan-strip" gap={0.08}>
-          {PLANS.map((p) => (
-            <Stagger.Item key={p.key} className={`strip-plan ${p.recommended ? "is-recommended" : ""}`}>
-              <SmartLink to={applyHref(p.key)} className="strip-link" aria-label={`${p.name}, ${priceText(p)}. Start with this plan`}>
-                {p.recommended && <span className="strip-badge">Recommended</span>}
-                {p.promo && <span className="strip-badge strip-badge-promo">{p.promo.off}</span>}
-                <span className="strip-name">{p.name}</span>
-                <span className="strip-price">
-                  {p.price ? (
-                    <>
-                      <span className="plan-currency">US$</span>
-                      <CountUp className="num" from={0} to={p.price} duration={1.2} />
-                      <span className="plan-period">/mo</span>
-                      {p.was && <s className="strip-was">${p.was}</s>}
-                    </>
-                  ) : (
-                    <span className="num">{p.priceLabel.replace("US$", "$")}</span>
-                  )}
-                </span>
-                <span className="strip-outcome">{p.outcome}</span>
-              </SmartLink>
-            </Stagger.Item>
-          ))}
-        </Stagger>
+        <PlanGrid />
       </div>
     </section>
   );
