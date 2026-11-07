@@ -630,8 +630,13 @@ html.menu-open .wa-float { opacity: 0; pointer-events: none; }
 .icon-badge { width: 64px; height: 64px; border-radius: 50%; border: 1px solid rgba(201, 160, 74, 0.5); color: var(--gold-hi); place-items: center; background: radial-gradient(circle, rgba(201, 160, 74, 0.16), transparent 70%); }
 .why-item .icon-badge { margin-bottom: 20px; }
 
-/* ============ Reduced motion ============ */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
-  .grain { display: none; }
+/* ============ Touch devices: same choreography, GPU-friendly ============ */
+@media (hover: none), (pointer: coarse) {
+  .grain { animation: none; inset: 0; opacity: 0.045; }
+  .hero-flare { mix-blend-mode: normal; opacity: 0.8; }
+  .manifesto-tag, .btn-ghost { backdrop-filter: none; }
+  .btn-ghost { background: rgba(6, 16, 11, 0.6); }
+  .nav.is-solid { backdrop-filter: none; background: rgba(6, 16, 11, 0.94); }
+  .hero-media, .program-card, .marquee-row, .stage-media, .pathway-ball { will-change: transform; }
+  .btn-gold::after { display: none; }
 }

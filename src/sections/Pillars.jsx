@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
-import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { AnimatePresence, motion, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
+import { useReducedMotion, blurIn, blurOut } from "../lib/device.js";
 import { Barbell, SoccerBall, Strategy, Brain, UsersThree } from "@phosphor-icons/react";
 import { PILLARS } from "../lib/site.js";
 import { getLenis } from "../lib/scroll.js";
@@ -62,9 +63,9 @@ export default function Pillars() {
                 <motion.div
                   key={P.key}
                   className="pillar-card"
-                  initial={reduce ? false : { opacity: 0, y: 26, filter: "blur(6px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  exit={reduce ? undefined : { opacity: 0, y: -18, filter: "blur(4px)", transition: { duration: 0.25 } }}
+                  initial={reduce ? false : { opacity: 0, y: 26, ...blurIn(6) }}
+                  animate={{ opacity: 1, y: 0, ...blurOut }}
+                  exit={reduce ? undefined : { opacity: 0, y: -18, ...blurIn(4), transition: { duration: 0.25 } }}
                   transition={{ duration: 0.55, ease: EASE }}
                 >
                   <h3 className="display d-m pillar-name">

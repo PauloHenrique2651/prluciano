@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { motion, useInView, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import { useReducedMotion, IS_TOUCH, blurIn, blurOut } from "../lib/device.js";
 import { scrollToHash } from "../lib/scroll.js";
 
 export const EASE = [0.22, 1, 0.36, 1];
@@ -58,8 +59,11 @@ export function Parallax({ children, amount = 12, className, style }) {
   const { scrollYProgress: enter } = useScroll({ target: ref, offset: ["start end", "start 45%"] });
   const clip = useTransform(enter, [0, 1], ["inset(18% 10% 18% 10% round 6px)", "inset(0% 0% 0% 0% round 0px)"]);
   const zoom = useTransform(enter, [0, 1], [1.25, 1.05]);
+  // Phones: same "opening" feel done with transform only (clip-path repaints every frame on mobile GPUs).
+  const frameScale = useTransform(enter, [0, 1], [0.86, 1]);
+  const frameStyle = reduce ? style : IS_TOUCH ? { ...style, scale: frameScale } : { ...style, clipPath: clip };
   return (
-    <motion.div ref={ref} className={className} style={{ ...style, clipPath: reduce ? undefined : clip }}>
+    <motion.div ref={ref} className={className} style={frameStyle}>
       <motion.div style={{ y, scale: reduce ? 1 : zoom, height: "100%" }}>{children}</motion.div>
     </motion.div>
   );
@@ -73,8 +77,8 @@ export function Reveal({ children, delay = 0, y = 36, className, style, as = "di
     <M
       className={className}
       style={style}
-      initial={reduce ? false : { opacity: 0, y, filter: "blur(8px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      initial={reduce ? false : { opacity: 0, y, ...blurIn(8) }}
+      whileInView={{ opacity: 1, y: 0, ...blurOut }}
       viewport={{ once: true, margin: "0px 0px -8% 0px" }}
       transition={{ duration: 0.9, ease: EASE, delay }}
     >
@@ -106,8 +110,8 @@ Stagger.Item = function StaggerItem({ children, className, style, as = "div", ..
       className={className}
       style={style}
       variants={{
-        hidden: { opacity: 0, y: 40, filter: "blur(6px)" },
-        show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.85, ease: EASE } },
+        hidden: { opacity: 0, y: 40, ...blurIn(6) },
+        show: { opacity: 1, y: 0, ...blurOut, transition: { duration: 0.85, ease: EASE } },
       }}
       {...rest}
     >

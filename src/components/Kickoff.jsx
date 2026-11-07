@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
+import { blurIn, blurOut } from "../lib/device.js";
 
 /** Opening shot: the stadium lights switch on one bank at a time, then the 11 burns in. ~2.4s, skippable. */
 const LIGHTS = [
@@ -39,8 +40,8 @@ export default function Kickoff({ onDone }) {
       </div>
       <motion.span
         className="kickoff-eleven num"
-        initial={{ opacity: 0, scale: 0.92, filter: "blur(12px)" }}
-        animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+        initial={{ opacity: 0, scale: 0.92, ...blurIn(12) }}
+        animate={{ opacity: 1, scale: 1, ...blurOut }}
         transition={{ duration: 1.1, delay: 1.05, ease: [0.22, 1, 0.36, 1] }}
       >
         11

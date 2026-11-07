@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
-import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, animate } from "framer-motion";
+import { motion, useMotionValue, useScroll, useSpring, useTransform, animate } from "framer-motion";
+import { useReducedMotion } from "../lib/device.js";
 import { WhatsappLogo, ShieldCheck } from "@phosphor-icons/react";
 import { Img, RevealLines, SmartLink, EASE, CountUp } from "../components/ui.jsx";
 import { waLink } from "../lib/site.js";

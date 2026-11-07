@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
-import { AnimatePresence, motion, MotionConfig, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, MotionConfig } from "framer-motion";
+import { useReducedMotion } from "./lib/device.js";
 import Lenis from "lenis";
 import Nav from "./components/Nav.jsx";
 import Footer from "./components/Footer.jsx";
@@ -68,13 +69,13 @@ export default function App() {
   const reduce = useReducedMotion();
   const [introDone, setIntroDone] = useState(() => {
     try {
-      return reduce || sessionStorage.getItem("ee-kickoff") === "1" || location.pathname !== "/";
+      return sessionStorage.getItem("ee-kickoff") === "1" || location.pathname !== "/";
     } catch {
       return true;
     }
   });
 
-  useSmoothScroll(!reduce);
+  useSmoothScroll(true);
 
   useEffect(() => {
     document.documentElement.style.overflow = introDone ? "" : "hidden";
@@ -103,7 +104,7 @@ export default function App() {
   };
 
   return (
-    <MotionConfig reducedMotion="user">
+    <MotionConfig reducedMotion="never">
       <a className="skip-link" href="#main">Skip to content</a>
       <AnimatePresence>{!introDone && <Kickoff onDone={finishIntro} />}</AnimatePresence>
       <Nav />

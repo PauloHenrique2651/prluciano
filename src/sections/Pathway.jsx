@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { Img, RevealLines } from "../components/ui.jsx";
+import { IS_TOUCH } from "../lib/device.js";
 
 /** The pathway is a real sequence, so the stages are numbered. A chalk line draws itself as you scroll and the ball travels it. */
 const STAGES = [
@@ -77,6 +78,9 @@ function Stage({ s, i }) {
   const o = useTransform(scrollYProgress, [0, 1], [0.25, 1]);
   const clip = useTransform(scrollYProgress, [0, 1], ["inset(0% 0% 100% 0%)", "inset(0% 0% 0% 0%)"]);
   const imgScale = useTransform(scrollYProgress, [0, 1], [1.2, 1]);
+  const mediaY = useTransform(scrollYProgress, [0, 1], [60, 0]);
+  const mediaScale = useTransform(scrollYProgress, [0, 1], [0.85, 1]);
+  const mediaStyle = IS_TOUCH ? { y: mediaY, scale: mediaScale } : { clipPath: clip };
   return (
     <li ref={ref} className="stage">
       <motion.span className="stage-marker" style={{ opacity: o }}>
@@ -87,7 +91,7 @@ function Stage({ s, i }) {
           <h3 className="display d-m">{s.title}</h3>
           <p className="body">{s.text}</p>
         </div>
-        <motion.div className="stage-media" style={{ clipPath: clip }}>
+        <motion.div className="stage-media" style={mediaStyle}>
           <motion.div style={{ scale: imgScale, height: "100%" }}>
             <Img name={s.img} alt={s.alt} sizes="(max-width: 860px) 90vw, 40vw" />
           </motion.div>
