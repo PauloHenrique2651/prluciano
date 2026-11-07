@@ -223,7 +223,7 @@ export function useSeo({ title, description, path }) {
       set('meta[property="og:description"]', "content", description);
     }
     set('meta[property="og:title"]', "content", title);
-    set('link[rel="canonical"]', "href", `https://prluciano.vercel.app${path}`);
-    set('meta[property="og:url"]', "content", `https://prluciano.vercel.app${path}`);
+    set('link[rel="canonical"]', "href", `https://site-eternal.vercel.app${path}`);
+    set('meta[property="og:url"]', "content", `https://site-eternal.vercel.app${path}`);
   }, [title, description, path]);
 }

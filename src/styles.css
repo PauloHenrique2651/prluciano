@@ -39,7 +39,7 @@
 *::before,
 *::after { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--nav-h) + 16px); }
+html { overflow-x: hidden; -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--nav-h) + 16px); }
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
 
@@ -629,6 +629,26 @@ html.menu-open .wa-float { opacity: 0; pointer-events: none; }
 
 .icon-badge { width: 64px; height: 64px; border-radius: 50%; border: 1px solid rgba(201, 160, 74, 0.5); color: var(--gold-hi); place-items: center; background: radial-gradient(circle, rgba(201, 160, 74, 0.16), transparent 70%); }
 .why-item .icon-badge { margin-bottom: 20px; }
+
+/* ============ Long labels (e.g. browser auto-translation) must never push past the screen ============ */
+.nav-inner { gap: 12px; }
+.nav-inner > a:first-child { min-width: 0; flex: 0 1 auto; }
+.wordmark, .wordmark-text { min-width: 0; }
+.wordmark-text b, .wordmark-text small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav-actions { flex: 0 0 auto; min-width: 0; }
+.display, .lede, .body, h3, .choice-box b { overflow-wrap: break-word; hyphens: auto; }
+
+@media (max-width: 640px) {
+  .btn { white-space: normal; text-align: center; line-height: 1.2; padding-block: 10px; max-width: 100%; }
+  .btn-row > .btn { flex: 1 1 auto; }
+  .nav-actions .btn-gold { white-space: nowrap; max-width: 44vw; overflow: hidden; text-overflow: ellipsis; display: inline-block; line-height: 44px; padding-block: 0; }
+}
+@media (max-width: 380px) {
+  .wordmark-mark { width: 38px; height: 38px; font-size: 25px; }
+  .wordmark-text b { font-size: 14px; }
+  .nav-actions .btn-gold { font-size: 14px; padding: 0 14px; }
+  .menu-btn { width: 44px; height: 44px; }
+}
 
 /* ============ Touch devices: same choreography, GPU-friendly ============ */
 @media (hover: none), (pointer: coarse) {
