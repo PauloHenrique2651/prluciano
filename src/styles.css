@@ -324,7 +324,8 @@ ul { margin: 0; padding: 0; list-style: none; }
 .pitch { position: relative; width: 100%; max-width: min(680px, calc((100svh - var(--nav-h) - 40px) * 80 / 68)); aspect-ratio: 80 / 68; margin-inline: auto; }
 .pitch-turf { position: absolute; inset: 1.47% 1.25%; border-radius: 2px; background: radial-gradient(90% 120% at 70% 50%, rgba(30, 74, 46, 0.55), rgba(6, 16, 11, 0) 75%), repeating-linear-gradient(90deg, rgba(237, 231, 214, 0.04) 0 8.33%, rgba(237, 231, 214, 0) 8.33% 16.66%); }
 .pitch svg.pitch-passes { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.pitch-ball { position: absolute; z-index: 2; width: 30px; height: 30px; margin: -15px 0 0 -15px; display: grid; place-items: center; border-radius: 50%; color: var(--chalk); background: rgba(6, 16, 11, 0.6); box-shadow: 0 0 0 1px rgba(236, 202, 122, 0.6), 0 8px 18px rgba(0, 0, 0, 0.55); pointer-events: none; }
+.pitch-ball-layer { position: absolute; inset: 0; z-index: 2; pointer-events: none; will-change: transform; }
+.pitch-ball { position: absolute; left: 0; top: 0; width: 30px; height: 30px; margin: -15px 0 0 -15px; display: grid; place-items: center; border-radius: 50%; color: var(--chalk); background: rgba(6, 16, 11, 0.6); box-shadow: 0 0 0 1px rgba(236, 202, 122, 0.6), 0 8px 18px rgba(0, 0, 0, 0.55); pointer-events: none; }
 .pitch svg.pitch-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
 .pitch-dot {
   position: absolute; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%;
@@ -680,6 +681,13 @@ html.menu-open .wa-float { visibility: hidden; pointer-events: none; }
   .hero-proof { margin-top: clamp(16px, 4svh, 40px); padding-top: 16px; }
   .proof-item .num { font-size: 28px; }
   .btn-lg { --h: 56px; }
+}
+/* Phones: the three proof points side by side, number on top, all on one baseline */
+@media (max-width: 640px) {
+  .hero-proof { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: start; }
+  .proof-item { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .proof-item .num { font-size: 30px; }
+  .proof-item span:last-child { font-size: 13px; max-width: none; }
 }
 @media (min-width: 861px) and (max-height: 600px) {
   .hero-proof { display: none; }
@@ -1057,8 +1065,7 @@ html.menu-open .wa-float { visibility: hidden; pointer-events: none; }
 .plan.is-recommended .plan-stub { background-color: #22341f; background-image: none; border-color: var(--gold); }
 .plan.has-promo .plan-body { border-color: rgba(236, 202, 122, 0.55); }
 .plan.has-promo .plan-stub { border-color: rgba(236, 202, 122, 0.55); background-image: linear-gradient(140deg, #e4c06f, var(--gold) 55%, #b48a35); }
-.plan.is-recommended { filter: drop-shadow(0 26px 40px rgba(0, 0, 0, 0.4)); }
-.plan .plan-body, .plan .plan-stub { will-change: transform; }
+.plan.is-recommended .plan-body, .plan.is-recommended .plan-stub { box-shadow: 0 26px 50px rgba(0, 0, 0, 0.35); }
 
 /* the seam sits between the two pieces, above both */
 .plan-seam { position: relative; height: 0; z-index: 3; }

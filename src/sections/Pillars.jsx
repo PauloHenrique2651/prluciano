@@ -79,10 +79,13 @@ function PassNetwork({ flow }) {
           <PassLine key={p.key} from={p.pos} to={PILLARS[k + 1].pos} k={k} flow={flow} />
         ))}
       </svg>
-      <motion.span className="pitch-ball" style={{ left, top }} aria-hidden="true">
-        <motion.span style={{ rotate: spin, display: "grid" }}>
-          <SoccerBall size={22} weight="fill" />
-        </motion.span>
+      {/* full-size layer moved with transform only: % of the layer = % of the pitch */}
+      <motion.span className="pitch-ball-layer" style={{ x: left, y: top }} aria-hidden="true">
+        <span className="pitch-ball">
+          <motion.span style={{ rotate: spin, display: "grid" }}>
+            <SoccerBall size={22} weight="fill" />
+          </motion.span>
+        </span>
       </motion.span>
     </>
   );
