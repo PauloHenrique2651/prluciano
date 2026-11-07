@@ -24,11 +24,6 @@ const MAP = {
   "sponsor-2": "9cfbd298-319a-48bb-96f5-448fed61302c",
   "sponsor-3": "b3b060bf-7834-453d-9f73-fe74f27bb9a5",
   "sponsor-4": "ea560058-5374-44fe-9697-98ca61fbd585",
-  "record-academic": "5110bf8c-016b-4215-b89e-4623fc62628c",
-  "record-attendance": "9a7a623c-58b0-4fb1-b1f8-87d61be1bbea",
-  "record-formation": "749ca493-b52f-4109-8995-164abc37277a",
-  "record-clinics": "3f27db66-b6b5-4c4d-8be4-1f989b33fc14",
-  "record-tournaments": "ccad0c00-5ffc-407a-9e45-35da1d642aa6",
 };
 
 await mkdir(OUT, { recursive: true });

@@ -19,7 +19,7 @@ function validate(v) {
  * Application / enquiry form. Posts to /api/submit with the same payload shape the site has always used.
  * variant="full" shows every field; "compact" keeps the home contact form short.
  */
-export default function ApplicationForm({ variant = "full", formName = "Application", defaultProgram = "" }) {
+export default function ApplicationForm({ variant = "full", formName = "Application", defaultProgram = "", extraFields = {} }) {
   const uid = useId();
   const formRef = useRef(null);
   const [values, setValues] = useState({ program: defaultProgram });
@@ -66,6 +66,7 @@ export default function ApplicationForm({ variant = "full", formName = "Applicat
     for (const [k, v] of Object.entries(values)) if (typeof v === "string" && v.trim()) fields[k] = v.trim();
     const program = PROGRAM_OPTIONS.find((p) => p.value === values.program);
     if (program) fields.program = program.label;
+    for (const [k, v] of Object.entries(extraFields)) if (v) fields[k] = v;
     try {
       const res = await fetch("/api/submit", {
         method: "POST",

@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { FileText, Globe, FilmSlate, GraduationCap, ArrowsClockwise, MagnifyingGlassPlus, X, WhatsappLogo } from "@phosphor-icons/react";
+import { motion } from "framer-motion";
+import { FileText, Globe, FilmSlate, GraduationCap, ArrowsClockwise, WhatsappLogo, Tag } from "@phosphor-icons/react";
+import Pricing from "../sections/Pricing.jsx";
+import RecordTimeline from "../sections/RecordTimeline.jsx";
 import { Img, RevealLines, SmartLink, useSeo, EASE, ScrollIcon } from "../components/ui.jsx";
 import { PHONE_DISPLAY, waLink } from "../lib/site.js";
 
@@ -12,13 +13,6 @@ const DELIVERABLES = [
   { icon: ArrowsClockwise, name: "Monthly profile management", text: "Résumé, statistics and highlights updated as the season progresses, so the profile a coach opens is never a year out of date." },
 ];
 
-const RECORD = [
-  { img: "record-academic", name: "Academic record", text: "Twelve subjects graded, with a 97 out of 100 average in the 2025–2026 school year." },
-  { img: "record-attendance", name: "Attendance and conduct", text: "Zero absences, zero tardies and an Outstanding conduct record across the full school year." },
-  { img: "record-formation", name: "Formation and competition", text: "In a youth academy in Honduras since 2019, and in the Honduran youth leagues across five seasons." },
-  { img: "record-clinics", name: "Clinics and camps", text: "Barça Academy clinics and camps in Barcelona and Miami, and the Luciano Emilio Soccer Camp in Honduras." },
-  { img: "record-tournaments", name: "Tournaments", text: "Copa Sin Fronteras in Guatemala in both 2024 and 2025." },
-];
 
 export default function Recruitment() {
   useSeo({
@@ -26,14 +20,6 @@ export default function Recruitment() {
     description: "Academic and athletic résumé, hosted athlete profile, highlight video and college recruitment guidance, kept current month by month.",
     path: "/athlete-recruitment",
   });
-  const [zoom, setZoom] = useState(null);
-
-  useEffect(() => {
-    if (!zoom) return;
-    const k = (e) => e.key === "Escape" && setZoom(null);
-    window.addEventListener("keydown", k);
-    return () => window.removeEventListener("keydown", k);
-  }, [zoom]);
 
   return (
     <>
@@ -56,6 +42,11 @@ export default function Recruitment() {
               Ask on WhatsApp
             </a>
           </div>
+          <p className="micro page-head-price">
+            <Tag size={18} weight="fill" color="var(--gold-hi)" aria-hidden="true" />
+            Plans from US$115/month.{" "}
+            <SmartLink to="#plans" className="text-link">See plans and prices</SmartLink>
+          </p>
         </div>
       </header>
 
@@ -89,31 +80,9 @@ export default function Recruitment() {
         </div>
       </section>
 
-      <section className="section day" aria-labelledby="record-title">
-        <div className="wrap">
-          <p className="kicker">Sample athlete profile</p>
-          <h2 id="record-title" className="display d-l" style={{ marginTop: 16 }}>
-            What the record actually looks like.
-          </h2>
-          <p className="body" style={{ marginTop: 20 }}>
-            A redacted example of the academic and athletic résumé we build, taken from a Grade 5 athlete. The name, the school and the teacher are withheld: a minor's record is only published with written parental consent.
-          </p>
-          <div className="record-grid">
-            {RECORD.map((r) => (
-              <button key={r.img} className="record" onClick={() => setZoom(r)} aria-label={`Enlarge: ${r.name}`}>
-                <span className="ph">
-                  <Img name={r.img} alt="" sizes="(max-width: 860px) 92vw, 45vw" />
-                  <span className="zoom" aria-hidden="true">
-                    <MagnifyingGlassPlus size={20} />
-                  </span>
-                </span>
-                <h3 className="display d-s">{r.name}</h3>
-                <p>{r.text}</p>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
+      <Pricing />
+
+      <RecordTimeline />
 
       <section className="final section" aria-labelledby="rec-cta">
         <div className="wrap">
@@ -136,32 +105,6 @@ export default function Recruitment() {
         </div>
       </section>
 
-      <AnimatePresence>
-        {zoom && (
-          <motion.div
-            className="lightbox"
-            role="dialog"
-            aria-modal="true"
-            aria-label={zoom.name}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setZoom(null)}
-          >
-            <motion.img
-              src={`/img/${zoom.img}-1600.webp`}
-              alt={`${zoom.name}, redacted sample record`}
-              initial={{ scale: 0.92, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              transition={{ duration: 0.45, ease: EASE }}
-              onClick={(e) => e.stopPropagation()}
-            />
-            <button className="lightbox-close" onClick={() => setZoom(null)} aria-label="Close" autoFocus>
-              <X size={22} weight="bold" />
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 }

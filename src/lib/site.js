@@ -64,7 +64,7 @@ export const PROGRAMS = [
     name: "Athlete Profile & College Recruitment",
     img: "study-desk",
     text: "Athletic résumé, highlight video, college recruitment guidance and month-to-month management of the profile.",
-    detail: "Built around what college coaches actually read and watch.",
+    detail: "Plans from US$115/month, built around what college coaches read and watch.",
     href: "/athlete-recruitment",
   },
   {
@@ -106,7 +106,7 @@ export const TEAM = [
 
 export const PROGRAM_OPTIONS = [
   { value: "international-week", label: "International Week", hint: "Training, tournament and exposure in the US" },
-  { value: "athlete-recruitment", label: "Athlete Profile & College Recruitment", hint: "Résumé, highlight video, recruitment guidance" },
+  { value: "athlete-recruitment", label: "Athlete Profile & College Recruitment", hint: "Plans from US$115/month" },
   { value: "athlete-profile", label: "Eternal Eleven Athlete Profile", hint: "Hosted profile in a single link" },
   { value: "website-exposure", label: "Official Website Exposure", hint: "Visibility on the Eternal Eleven website" },
   { value: "le11-training", label: "LE11 position training", hint: "Private and small-group sessions with Luciano" },
