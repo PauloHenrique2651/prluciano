@@ -1123,6 +1123,29 @@ html.menu-open .wa-float { visibility: hidden; pointer-events: none; }
 .rt-photo { border-radius: 6px; overflow: hidden; border: 6px solid #fff; box-shadow: 0 30px 60px rgba(20, 19, 15, 0.16); aspect-ratio: 1264 / 843; }
 .rt-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 @media (max-width: 860px) { .rt-head { grid-template-columns: 1fr; } .rt-photo { border-width: 4px; } }
+.rt-video { margin: 0; max-width: 1040px; }
+.rt-video-screen { position: relative; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; background: var(--night); border: 6px solid #fff; box-shadow: 0 30px 60px rgba(20, 19, 15, 0.18); }
+.rt-video-screen iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.rt-video-poster { position: absolute; inset: 0; width: 100%; display: block; cursor: pointer; }
+.rt-video-poster img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.9s var(--ease-out), filter 0.5s; filter: brightness(0.82); }
+.rt-video-poster::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgba(6, 16, 11, 0.75)); }
+.rt-video-play { position: absolute; z-index: 1; left: 50%; top: 50%; width: 84px; height: 84px; margin: -42px 0 0 -42px; border-radius: 50%; display: grid; place-items: center; background: var(--gold); color: var(--night); box-shadow: 0 0 0 10px rgba(201, 160, 74, 0.25), 0 18px 40px rgba(0, 0, 0, 0.45); transition: transform 0.35s var(--ease-out), box-shadow 0.35s; }
+.rt-video-play svg { margin-left: 4px; }
+.rt-video-label { position: absolute; z-index: 1; left: 22px; bottom: 18px; color: var(--chalk); font-weight: 600; font-size: 16px; }
+.rt-video-poster:hover img, .rt-video-poster:focus-visible img { transform: scale(1.04); filter: brightness(0.95); }
+.rt-video-poster:hover .rt-video-play, .rt-video-poster:focus-visible .rt-video-play { transform: scale(1.08); box-shadow: 0 0 0 16px rgba(201, 160, 74, 0.2), 0 18px 40px rgba(0, 0, 0, 0.45); }
+.rt-video-poster:active .rt-video-play { transform: scale(0.95); }
+.rt-video figcaption { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 14px; color: var(--ink-dim); }
+.rt-video figcaption svg { color: #c4302b; flex: none; }
+/* Home, Education: the video takes the big frame; José's card sits on it until play */
+.edu-media.has-video .a { aspect-ratio: 16 / 9; overflow: visible; }
+.edu-media.has-video .rt-video, .edu-media.has-video .rt-video-screen { height: 100%; }
+.edu-media.has-video .rt-video-screen { border: 0; border-radius: 4px; box-shadow: 0 30px 60px rgba(20, 19, 15, 0.18); }
+.edu-media.has-video .rt-video-label { top: 16px; bottom: auto; left: 18px; }
+.edu-media.has-video .rt-video-play { left: 30%; }
+.edu-media .b { transition: opacity 0.5s var(--ease-out), transform 0.6s var(--ease-out); }
+.edu-media.is-playing .b { opacity: 0; transform: translateY(24px); pointer-events: none; }
+@media (max-width: 640px) { .rt-video-screen { border-width: 4px; } .rt-video-play { width: 64px; height: 64px; margin: -32px 0 0 -32px; } .rt-video-label { left: 14px; bottom: 12px; font-size: 14px; } }
 .rt-track { position: relative; margin-top: clamp(40px, 6vw, 72px); padding-left: 48px; }
 .rt-line { position: absolute; left: 11px; top: 6px; height: calc(100% - 6px); width: 2px; overflow: visible; }
 .rt-dot { position: absolute; left: 12px; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: var(--gold-deep); box-shadow: 0 0 0 6px rgba(138, 106, 36, 0.18); }

@@ -4,6 +4,7 @@ import { CheckCircle, Plus, WhatsappLogo, Check, Medal, Target, AirplaneTilt, Gr
 import { POSITIONS, TEAM, WHY, PHONE_DISPLAY, waLink } from "../lib/site.js";
 import { Img, Parallax, RevealLines, SmartLink, EASE, Reveal, Stagger, ScrollIcon, CountUp, Marquee } from "../components/ui.jsx";
 import ApplicationForm from "../components/ApplicationForm.jsx";
+import VideoCard from "../components/VideoCard.jsx";
 
 export function About() {
   return (
@@ -116,14 +117,14 @@ export function Club() {
 }
 
 export function Education() {
+  const [playing, setPlaying] = useState(false);
   return (
     <section className="section day" id="education" aria-labelledby="edu-title">
       <div className="wrap edu">
-        <div className="edu-media">
+        {/* José Armando's video, with his card on top until the video plays */}
+        <div className={`edu-media has-video ${playing ? "is-playing" : ""}`}>
           <div className="a">
-            <Parallax amount={14} style={{ height: "100%" }}>
-              <Img name="library" alt="A student-athlete writing notes in a university library at night" sizes="(max-width: 860px) 92vw, 46vw" />
-            </Parallax>
+            <VideoCard id="SLhQ-wKjOsM" title="José Armando Rodríguez Chacón" caption={false} onPlay={() => setPlaying(true)} />
           </div>
           <div className="b">
             <Img name="record-academic" alt="José Armando Rodríguez Chacón, student-athlete, Grade 5, 2025–2026 school year" sizes="(max-width: 860px) 70vw, 26vw" />
