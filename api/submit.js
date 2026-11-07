@@ -29,7 +29,8 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: "invalid_submission" });
   }
 
-  const name = formName(body.token) || "Formulário do site";
+  const name =
+    (typeof body.form_name === "string" && body.form_name.slice(0, 80)) || formName(body.token) || "Formulário do site";
   const page = typeof body.page_url === "string" ? body.page_url.slice(0, 500) : "";
   const rows = Object.entries(fields)
     .map(([k, v]) => `<tr><td style="padding:4px 12px 4px 0"><b>${escape(k)}</b></td><td>${escape(v)}</td></tr>`)

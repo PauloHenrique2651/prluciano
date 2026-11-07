@@ -1,39 +1,35 @@
 # prluciano
 
-Site da Eternal Eleven Agency — estático, pronto para a Vercel.
+Site da Eternal Eleven Agency — React + Vite + Framer Motion, pronto para a Vercel.
 
-Páginas: `/`, `/sponsors`, `/athlete-recruitment`, `/application-enrollment`.
-
-## Publicar na Vercel
-
-1. vercel.com → **Add New → Project** → importe `PauloHenrique2651/prluciano`.
-2. Framework Preset: **Other**. Não mexa em build/output. **Deploy**.
-3. (Para receber os formulários por e-mail) **Settings → Environment Variables**:
-   - `RESEND_API_KEY` — chave grátis em https://resend.com
-   - `CONTACT_EMAIL` — e-mail que recebe as mensagens
-   - `FROM_EMAIL` — opcional (ex.: `Eternal Eleven <contato@seudominio.com>` depois de verificar o domínio no Resend)
-
-   Depois de salvar, faça **Redeploy**. Sem essas variáveis o formulário funciona, mas as mensagens só aparecem em **Logs** na Vercel.
-
-## Domínio
-
-Canonical, Open Graph, sitemap e robots usam `https://prluciano.vercel.app`. Se o projeto ganhar outro endereço ou domínio próprio, troque essa URL em todos os arquivos:
-
-```bash
-grep -rl "prluciano.vercel.app" . | xargs sed -i "s#https://prluciano.vercel.app#https://seudominio.com#g"
-```
+Páginas: `/`, `/athlete-recruitment`, `/sponsors`, `/application-enrollment`.
 
 ## Rodar localmente
 
 ```bash
-python -m http.server 5173
+npm install
+npm run dev
 ```
 
-Abra http://localhost:5173 (o envio de formulário só funciona na Vercel ou com `vercel dev`).
+Abra http://localhost:5173 (ou o IP do PC na mesma rede, pelo celular).
+
+## Publicar na Vercel
+
+O `vercel.json` já define: framework Vite, build `vite build`, saída `dist`, rotas SPA e a função `api/submit`.
+
+Para receber os formulários por e-mail, em **Settings → Environment Variables**:
+- `RESEND_API_KEY` — chave grátis em https://resend.com
+- `CONTACT_EMAIL` — e-mail que recebe as mensagens
+- `FROM_EMAIL` — opcional
+
+Sem essas variáveis, o formulário funciona e as mensagens aparecem em **Logs** na Vercel.
 
 ## Estrutura
 
-- `index.html`, `*/index.html` — páginas
-- `assets/` — imagens
-- `api/submit.js` — função que recebe os formulários e envia e-mail via Resend
-- `vercel.json` — URLs limpas e cache
+- `src/sections/` — seções da home (hero, pilares, pathway, programas, etc.)
+- `src/pages/` — páginas
+- `src/components/` — nav, rodapé, WhatsApp flutuante, formulário, primitivas de motion (`ui.jsx`)
+- `src/lib/site.js` — textos, programas, equipe e número do WhatsApp
+- `public/img/` — fotos otimizadas em WebP (gere de novo com `npm run images`)
+- `legacy/` — cópia do site original da Relume (referência; não é publicada)
+- `api/submit.js` — recebe os formulários e envia e-mail via Resend
