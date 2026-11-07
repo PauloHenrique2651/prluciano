@@ -169,6 +169,7 @@ export default function Pricing({ id = "plans" }) {
               </div>
 
               <div className="plan-stub" id={p.promo ? "promo-stub" : undefined}>
+                <span className="plan-perf" aria-hidden="true" />
                 {p.promo && (
                   <p className="plan-code">
                     <span>Your code</span>
@@ -192,6 +193,10 @@ export default function Pricing({ id = "plans" }) {
                   <WhatsappLogo size={18} weight="fill" aria-hidden="true" />
                   Ask about this plan on WhatsApp
                 </a>
+                <div className="plan-barcode" aria-hidden="true">
+                  <span />
+                  <small>Pass {i + 1} of {PLANS.length}</small>
+                </div>
               </div>
             </Stagger.Item>
           ))}

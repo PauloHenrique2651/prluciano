@@ -935,6 +935,22 @@ html.menu-open .wa-float { visibility: hidden; pointer-events: none; }
   .offer-bar-cta { --h: 46px; padding: 0 16px; font-size: 15px; flex: none; }
 }
 
+/* ---- Ticket shape, made unmistakable ---- */
+.plan-stub { border-top: 0; padding-top: 30px; background: rgba(237, 231, 214, 0.045); }
+.plan.is-recommended .plan-stub { background: rgba(201, 160, 74, 0.12); }
+.plan-stub::before, .plan-stub::after { top: -17px; width: 34px; height: 34px; background: var(--night); box-shadow: inset 0 0 0 1px var(--line); border: 0; }
+.plan-stub::before { left: -17px; }
+.plan-stub::after { right: -17px; }
+.plan.is-recommended .plan-stub::before, .plan.is-recommended .plan-stub::after { box-shadow: inset 0 0 0 1px var(--gold); }
+.plan.has-promo .plan-stub::before, .plan.has-promo .plan-stub::after { box-shadow: inset 0 0 0 1px rgba(236, 202, 122, 0.55); }
+.plan-perf { position: absolute; left: 24px; right: 24px; top: -2px; height: 4px; background: radial-gradient(circle, rgba(237, 231, 214, 0.4) 1.6px, transparent 2.2px) 0 0 / 12px 4px repeat-x; }
+.plan.is-recommended .plan-perf { background-image: radial-gradient(circle, rgba(236, 202, 122, 0.75) 1.6px, transparent 2.2px); }
+.plan.has-promo .plan-perf { background-image: radial-gradient(circle, rgba(6, 16, 11, 0.55) 1.6px, transparent 2.2px); }
+.plan-barcode { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 4px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--chalk-dim); }
+.plan-barcode span { flex: 1; max-width: 150px; height: 28px; opacity: 0.55; background: repeating-linear-gradient(90deg, currentColor 0 2px, transparent 2px 4px, currentColor 4px 5px, transparent 5px 8px, currentColor 8px 11px, transparent 11px 12px, currentColor 12px 13px, transparent 13px 16px); }
+.plan-barcode small { font-size: 12px; font-weight: 600; white-space: nowrap; }
+.plan.has-promo .plan-barcode { color: var(--night); border-top-color: rgba(6, 16, 11, 0.2); }
+
 .plan-reassure { margin-top: clamp(28px, 4vw, 44px); display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 16px 20px; border-radius: 14px; border: 1px dashed rgba(201, 160, 74, 0.5); }
 .plan-reassure svg { color: var(--gold-hi); flex: none; }
 .plan-reassure p { flex: 1 1 320px; color: var(--chalk-dim); }
