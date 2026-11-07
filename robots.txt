@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://hzmjfrst.relumesite.ai/sitemap.xml
+Sitemap: https://prluciano.vercel.app/sitemap.xml

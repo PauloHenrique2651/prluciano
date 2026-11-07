@@ -1,0 +1,7 @@
+{
+  "tool_name": "mcp__Claude_Browser__javascript_tool",
+  "tool_input_preview": "{\"action\":\"javascript_exec\",\"text\":\"await new Promise(r=>setTimeout(r,1000));\\nwindow.__calls=[]; const of=window.fetch; window.fetch=async(u,o)=>{window.__calls.push({u,body:o&&o.body}); return new R...",
+  "error": "javascript_tool failed: TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:69",
+  "timestamp": "2026-11-07T01:10:50.099Z",
+  "retry_count": 1
+}
