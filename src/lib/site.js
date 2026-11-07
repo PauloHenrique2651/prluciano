@@ -100,7 +100,7 @@ export const WHY = [
 
 export const TEAM = [
   { name: "Luciano Emilio", role: "Founder & Executive Director", img: "team-luciano" },
-  { name: "Emily de Barros", role: "Deputy Director of Operations & Student-Athlete Relations", img: "team-emily" },
+  { name: "Emily Cristina", role: "Deputy Director of Operations & Student-Athlete Relations", img: "team-emily" },
   { name: "Ana Carolina", role: "Director of College Research, Admissions & Recruitment Applications", img: "team-ana" },
 ];
 
