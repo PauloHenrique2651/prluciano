@@ -6,8 +6,10 @@ export const PLANS = [
     name: "Basic College Pathway",
     short: "Basic",
     outcome: "Get the athlete's record ready",
-    price: 115,
+    price: 55,
+    was: 115,
     period: "/month",
+    promo: { code: "ETERNAL52", off: "52% off", label: "Launch offer" },
     text: "Sports profile, résumé and initial guidance.",
     features: ["Athletic profile", "Academic and athletic résumé", "Initial college guidance"],
   },
@@ -54,6 +56,36 @@ export const PLANS = [
   },
 ];
 
+/** Price as written in messages and the application, e.g. "US$55/month (launch code ETERNAL52, regular US$115)". */
+export function planPriceText(p) {
+  if (!p.price) return p.priceLabel;
+  const base = `US$${p.price}/month`;
+  return p.promo ? `${base} (launch code ${p.promo.code}, regular US$${p.was})` : base;
+}
+
+// What each plan includes, for the comparison table. `from` is the first plan (0-3) that includes it.
+export const PLAN_COMPARE = [
+  { label: "Athletic profile", from: 0 },
+  { label: "Academic and athletic résumé", from: 0 },
+  { label: "Initial college guidance", from: 0 },
+  { label: "Universities matched to the athlete's level", from: 1 },
+  { label: "Contact with college coaches and follow-up", from: 1 },
+  { label: "Recommendation letter", from: 1 },
+  { label: "Monthly meeting with the athlete and family", from: 1 },
+  { label: "Monthly report of contacts and opportunities", from: 1 },
+  { label: "Help preparing university applications", from: 2 },
+  { label: "Academic and athletic scholarship search", from: 2 },
+  { label: "Full guidance through the process", from: 2 },
+  { label: "Personalized one-to-one support", from: 3 },
+  { label: "Accompaniment from first contact to decision", from: 3 },
+];
+
+export const START_STEPS = [
+  { title: "Send the application", text: "A short form about the athlete: school, position, teams and goals." },
+  { title: "We recommend a plan", text: "We read it, reply on WhatsApp or by phone and explain which plan fits and why." },
+  { title: "You decide", text: "You only pay once you agree with the plan. Then we start on the athlete's record." },
+];
+
 export const RECOMMENDED_INCLUDES = [
   "Academic and athletic résumé, with the athlete's profile kept up to date",
   "Universities matched to the student's academic and athletic level",
@@ -86,7 +118,7 @@ export const PRICING_FAQ = [
   },
 ];
 
-// Achievements from the sample record (Grade 5 athlete), grouped two years at a time, newest first.
+// José Armando Rodríguez Chacón's achievements (Grade 5), grouped two years at a time, newest first.
 export const RECORD_TIMELINE = [
   {
     years: "2026 – 2025",

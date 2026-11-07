@@ -126,7 +126,7 @@ export function Education() {
             </Parallax>
           </div>
           <div className="b">
-            <Img name="drills" alt="" sizes="(max-width: 860px) 46vw, 22vw" />
+            <Img name="record-academic" alt="José Armando Rodríguez Chacón, student-athlete, Grade 5, 2025–2026 school year" sizes="(max-width: 860px) 70vw, 26vw" />
           </div>
         </div>
         <div>

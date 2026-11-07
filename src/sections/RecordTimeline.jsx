@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { GraduationCap, Trophy, Tent, SoccerBall, Flag, Buildings } from "@phosphor-icons/react";
 import { RECORD_TIMELINE } from "../lib/pricing.js";
-import { RevealLines, Reveal, ScrollIcon, Stagger } from "../components/ui.jsx";
+import { Img, RevealLines, Reveal, ScrollIcon, Stagger } from "../components/ui.jsx";
 
 const TAG_ICON = { School: GraduationCap, Tournament: Trophy, Camp: Tent, Clinic: Flag, League: SoccerBall, Academy: Buildings };
 
@@ -16,11 +16,24 @@ export default function RecordTimeline() {
   return (
     <section className="section day" id="sample-record" aria-label="Sample athlete profile">
       <div className="wrap">
-        <p className="kicker">Sample athlete profile</p>
-        <RevealLines as="h2" className="display d-l" lines={["What the record", "actually looks like."]} />
-        <Reveal as="p" className="body" style={{ marginTop: 20 }}>
-          The achievements of a Grade 5 athlete, two years at a time. The name, the school and the teacher are withheld: a minor's record is only published with written parental consent.
-        </Reveal>
+        <div className="rt-head">
+          <div>
+            <p className="kicker">Sample athlete profile</p>
+            <RevealLines as="h2" className="display d-l" lines={["What the record", "actually looks like."]} />
+            <Reveal as="p" className="body" style={{ marginTop: 20 }}>
+              José Armando Rodríguez Chacón is in Grade 5, in the 2025–2026 school year. These are his achievements so far, two years at a time.
+            </Reveal>
+          </div>
+          <Reveal className="rt-photo" delay={0.1}>
+            <Img
+              name="record-academic"
+              alt="José Armando Rodríguez Chacón, student-athlete, Grade 5, 2025–2026 school year"
+              sizes="(max-width: 860px) 92vw, 44vw"
+              width={1264}
+              height={843}
+            />
+          </Reveal>
+        </div>
 
         <div className="rt-track" ref={track}>
           <svg className="rt-line" viewBox="0 0 2 100" preserveAspectRatio="none" aria-hidden="true">

@@ -3,7 +3,7 @@ import { WhatsappLogo } from "@phosphor-icons/react";
 import ApplicationForm from "../components/ApplicationForm.jsx";
 import { RevealLines, useSeo } from "../components/ui.jsx";
 import { PHONE_DISPLAY, PROGRAM_OPTIONS, waLink } from "../lib/site.js";
-import { PLANS } from "../lib/pricing.js";
+import { PLANS, planPriceText } from "../lib/pricing.js";
 import { Tag } from "@phosphor-icons/react";
 
 const STEPS = [
@@ -22,7 +22,7 @@ export default function Apply() {
   const pre = params.get("program");
   const defaultProgram = PROGRAM_OPTIONS.some((p) => p.value === pre) ? pre : "";
   const plan = PLANS.find((p) => p.key === params.get("plan"));
-  const planLabel = plan ? `${plan.name} (${plan.price ? `US$${plan.price}/month` : plan.priceLabel})` : "";
+  const planLabel = plan ? `${plan.name}, ${planPriceText(plan)}` : "";
 
   return (
     <section className="page-head" aria-labelledby="apply-title" style={{ paddingBottom: "clamp(88px, 12vw, 160px)" }}>

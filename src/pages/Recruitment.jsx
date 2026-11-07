@@ -44,7 +44,7 @@ export default function Recruitment() {
           </div>
           <p className="micro page-head-price">
             <Tag size={18} weight="fill" color="var(--gold-hi)" aria-hidden="true" />
-            Plans from US$115/month.{" "}
+            Plans from US$55/month.{" "}
             <SmartLink to="#plans" className="text-link">See plans and prices</SmartLink>
           </p>
         </div>

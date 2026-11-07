@@ -13,6 +13,7 @@ const MAP = {
   "study-desk": "51073dba-a871-467e-b7a6-bd6aaee5778d",
   "stadium-walk": "67f811ab-38c4-4056-9f9c-1bc36eda8eef",
   drills: "6b14cf5e-2fc5-45ad-9c5c-1b00a68a56c3",
+  "record-academic": "5110bf8c-016b-4215-b89e-4623fc62628c",
   library: "92ce4a74-bd23-4cd9-9233-8a4937bcdca0",
   "luciano-boot": "e250bba1-1c79-4099-9e9b-cf71f998b29b",
   "dc-united": "47373580-9092-4174-8324-1acd7cf8ac2c",
