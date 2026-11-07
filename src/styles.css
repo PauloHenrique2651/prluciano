@@ -550,7 +550,7 @@ fieldset.field { border: 0; padding: 0; margin: 0; }
 
 /* ============ WhatsApp float ============ */
 .wa-float { position: fixed; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); z-index: var(--z-float); display: flex; align-items: flex-end; gap: 12px; }
-html.menu-open .wa-float { opacity: 0; pointer-events: none; }
+html.menu-open .wa-float { visibility: hidden; pointer-events: none; }
 .wa-btn::before { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid var(--wa); animation: wa-ring 4s var(--ease-out) infinite; pointer-events: none; }
 @keyframes wa-ring { 0% { transform: scale(1); opacity: 0.4; } 45%, 100% { transform: scale(1.32); opacity: 0; } }
 .footer-credit { color: var(--chalk); border-bottom: 1px solid var(--line-strong); transition: color 0.2s, border-color 0.2s; }
@@ -673,3 +673,57 @@ html.menu-open .wa-float { opacity: 0; pointer-events: none; }
   .hero-media, .program-card, .marquee-row, .stage-media, .pathway-ball { will-change: transform; }
   .btn-gold::after { display: none; }
 }
+
+/* ============ Cookie consent ============ */
+.cookie-bar {
+  position: fixed; z-index: 70; left: max(16px, env(safe-area-inset-left)); right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom)); max-width: 980px; margin-inline: auto;
+  display: flex; align-items: center; gap: 20px 28px; flex-wrap: wrap;
+  padding: 18px 20px; border-radius: 16px; background: var(--turf); border: 1px solid var(--line-strong);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+.cookie-bar-text { display: flex; gap: 14px; align-items: flex-start; flex: 1 1 380px; }
+.cookie-bar-text p { font-size: 15px; line-height: 1.5; color: var(--chalk-dim); }
+.cookie-icon { color: var(--gold-hi); flex: none; margin-top: 1px; }
+.cookie-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.cookie-actions .btn { flex: 1 1 auto; }
+@media (max-width: 1180px) { html.cookie-open .wa-float { visibility: hidden; pointer-events: none; } }
+@media (max-width: 640px) {
+  .cookie-bar { padding: 16px; gap: 14px; }
+  .cookie-bar-text { flex-basis: 100%; }
+  .cookie-actions { width: 100%; }
+  .cookie-actions .btn { flex: 1 1 0; padding-inline: 10px; }
+}
+
+.cookie-scrim { position: fixed; inset: 0; z-index: 140; background: rgba(2, 6, 4, 0.72); display: grid; place-items: end center; padding: 16px; }
+@media (min-width: 641px) { .cookie-scrim { place-items: center; } }
+.cookie-panel {
+  position: relative; width: min(560px, 100%); max-height: calc(100svh - 32px); overflow: auto;
+  padding: 28px 24px 24px; border-radius: 18px; background: var(--turf); border: 1px solid var(--line-strong);
+}
+.cookie-close { position: absolute; top: 12px; right: 12px; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: var(--chalk-dim); }
+.cookie-close:hover { color: var(--chalk); }
+.cookie-list { margin-top: 20px; border-top: 1px solid var(--line); }
+.cookie-row { display: flex; gap: 16px; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.cookie-row b { font-weight: 600; }
+.cookie-row p { font-size: 14px; color: var(--chalk-dim); margin-top: 4px; }
+.cookie-actions-panel { margin-top: 20px; }
+
+.switch { position: relative; flex: none; width: 52px; height: 30px; cursor: pointer; }
+.switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: inherit; }
+.switch span { position: absolute; inset: 0; border-radius: 999px; background: rgba(237, 231, 214, 0.18); transition: background-color 0.25s; }
+.switch span::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--chalk); transition: transform 0.3s var(--ease-out); }
+.switch input:checked + span { background: var(--gold); }
+.switch input:checked + span::after { transform: translateX(22px); background: var(--night); }
+.switch input:focus-visible + span { outline: 2px solid var(--gold-hi); outline-offset: 3px; }
+.switch.is-locked { cursor: not-allowed; opacity: 0.6; }
+
+.footer-cookie { color: var(--chalk-dim); text-decoration: underline; text-underline-offset: 3px; }
+.footer-cookie:hover { color: var(--gold-hi); }
+
+/* ============ Legal page ============ */
+.legal-wrap { max-width: 820px; }
+.legal-body { margin-top: 40px; display: grid; gap: 16px; color: var(--chalk-dim); }
+.legal-body h2 { color: var(--chalk); margin-top: 24px; }
+.legal-body ul { display: grid; gap: 10px; padding-left: 18px; list-style: disc; }
+.legal-body b { color: var(--chalk); }

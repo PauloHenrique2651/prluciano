@@ -1,5 +1,6 @@
 import { NAV, PHONE_DISPLAY, PHONE_TEL, WA_DEFAULT } from "../lib/site.js";
 import { SmartLink } from "./ui.jsx";
+import { openCookieSettings } from "../lib/consent.js";
 
 export default function Footer() {
   return (
@@ -40,6 +41,11 @@ export default function Footer() {
         </div>
         <div className="footer-base">
           <span>© {new Date().getFullYear()} Eternal Eleven Agency. All rights reserved.</span>
+          <span className="footer-legal">
+            <SmartLink to="/privacy" className="footer-cookie">Privacy &amp; cookies</SmartLink>
+            {" · "}
+            <button type="button" className="footer-cookie" onClick={openCookieSettings}>Cookie settings</button>
+          </span>
           <span>
             Desenvolvido por{" "}
             <a className="footer-credit" href="https://www.gideonsystems.com.br" target="_blank" rel="noopener">

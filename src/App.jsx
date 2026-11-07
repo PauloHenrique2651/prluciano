@@ -12,6 +12,8 @@ import Recruitment from "./pages/Recruitment.jsx";
 import Sponsors from "./pages/Sponsors.jsx";
 import Apply from "./pages/Apply.jsx";
 import NotFound from "./pages/NotFound.jsx";
+import Privacy from "./pages/Privacy.jsx";
+import CookieConsent from "./components/CookieConsent.jsx";
 
 import { getLenis, scrollToHash, scrollTop, setLenis } from "./lib/scroll.js";
 
@@ -117,6 +119,7 @@ export default function App() {
               <Route path="/sponsors" element={<Sponsors />} />
               <Route path="/application-enrollment" element={<Apply />} />
               <Route path="/apply" element={<Apply />} />
+              <Route path="/privacy" element={<Privacy />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Page>
@@ -124,6 +127,7 @@ export default function App() {
       </main>
       <Footer />
       <WhatsAppFloat ready={introDone} />
+      <CookieConsent ready={introDone} />
       <div className="grain" aria-hidden="true" />
     </MotionConfig>
   );
