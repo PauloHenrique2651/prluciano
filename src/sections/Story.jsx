@@ -126,7 +126,7 @@ export function Education() {
             </Parallax>
           </div>
           <div className="b">
-            <Img name="record-academic" alt="" sizes="22vw" />
+            <Img name="drills" alt="" sizes="(max-width: 860px) 46vw, 22vw" />
           </div>
         </div>
         <div>

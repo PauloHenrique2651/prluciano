@@ -10,7 +10,9 @@ export function Wordmark() {
     <span className="wordmark notranslate" translate="no">
       <span className="wordmark-mark" aria-hidden="true">11</span>
       <span className="wordmark-text">
-        <b>ETERNAL ELEVEN</b>
+        <b>
+          <span>ETERNAL</span> <span>ELEVEN</span>
+        </b>
         <small>AGENCY</small>
       </span>
     </span>
@@ -66,8 +68,9 @@ export default function Nav() {
               <WhatsappLogo size={18} weight="fill" aria-hidden="true" />
               WhatsApp
             </a>
-            <SmartLink to="/application-enrollment" className="btn btn-gold btn-sm">
-              Apply now
+            <SmartLink to="/application-enrollment" className="btn btn-gold btn-sm" aria-label="Apply now">
+              <span className="lbl-long">Apply now</span>
+              <span className="lbl-short" aria-hidden="true">Apply</span>
             </SmartLink>
             <button
               className="menu-btn"

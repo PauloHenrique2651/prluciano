@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { motion, useMotionValue, useScroll, useSpring, useTransform, animate } from "framer-motion";
-import { useReducedMotion } from "../lib/device.js";
+import { useReducedMotion, IS_TOUCH } from "../lib/device.js";
 import { WhatsappLogo, ShieldCheck } from "@phosphor-icons/react";
 import { Img, RevealLines, SmartLink, EASE, CountUp } from "../components/ui.jsx";
 import { waLink } from "../lib/site.js";
@@ -11,8 +11,10 @@ export default function Hero({ play }) {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const scale = useTransform(scrollYProgress, [0, 1], [1.06, 1.28]);
   const imgY = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
-  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "-18%"]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
+  // Text stays fully readable while it's on screen; it only dims on its way out.
+  // (On phones the hero is taller than the screen, so an early fade would wash out the CTAs.)
+  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", IS_TOUCH ? "-6%" : "-12%"]);
+  const contentOpacity = useTransform(scrollYProgress, IS_TOUCH ? [0.75, 1] : [0.55, 0.95], [1, 0]);
 
   // Floodlight flare: follows the pointer on desktop, drifts on its own on touch screens.
   const fx = useMotionValue(0);

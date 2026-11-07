@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import { useReducedMotion, IS_TOUCH, blurIn, blurOut } from "../lib/device.js";
-import { scrollToHash } from "../lib/scroll.js";
+import { scrollToHash, getLenis } from "../lib/scroll.js";
 
 export const EASE = [0.22, 1, 0.36, 1];
 
@@ -188,6 +188,14 @@ export function SmartLink({ to, children, onClick, ...rest }) {
   const handle = (e) => {
     onClick?.(e);
     const [path, hash] = to.split("#");
+    // Already on this page and no section asked for: glide back to the top (logo / "Home").
+    if (!hash && !to.includes("?") && path === window.location.pathname) {
+      e.preventDefault();
+      if (window.location.hash) history.replaceState(null, "", path);
+      const lenis = getLenis();
+      lenis ? lenis.scrollTo(0, { duration: 1.4 }) : window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
     if (hash && (path === "" || path === window.location.pathname)) {
       if (scrollToHash("#" + hash)) {
         e.preventDefault();
