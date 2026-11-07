@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 import { useReducedMotion } from "./lib/device.js";
@@ -8,11 +8,12 @@ import Footer from "./components/Footer.jsx";
 import WhatsAppFloat from "./components/WhatsAppFloat.jsx";
 import Kickoff from "./components/Kickoff.jsx";
 import Home from "./pages/Home.jsx";
-import Recruitment from "./pages/Recruitment.jsx";
-import Sponsors from "./pages/Sponsors.jsx";
-import Apply from "./pages/Apply.jsx";
-import NotFound from "./pages/NotFound.jsx";
-import Privacy from "./pages/Privacy.jsx";
+// Inner pages load on demand, so the home page ships less JavaScript.
+const Recruitment = lazy(() => import("./pages/Recruitment.jsx"));
+const Sponsors = lazy(() => import("./pages/Sponsors.jsx"));
+const Apply = lazy(() => import("./pages/Apply.jsx"));
+const NotFound = lazy(() => import("./pages/NotFound.jsx"));
+const Privacy = lazy(() => import("./pages/Privacy.jsx"));
 import CookieConsent from "./components/CookieConsent.jsx";
 
 import { getLenis, scrollToHash, scrollTop, setLenis } from "./lib/scroll.js";
@@ -82,6 +83,17 @@ export default function App() {
 
   useSmoothScroll(true);
 
+  // Once the page is idle, fetch the other pages in the background so navigating stays instant.
+  useEffect(() => {
+    const warm = () => {
+      import("./pages/Recruitment.jsx");
+      import("./pages/Apply.jsx");
+      import("./pages/Sponsors.jsx");
+    };
+    const id = "requestIdleCallback" in window ? requestIdleCallback(warm, { timeout: 4000 }) : setTimeout(warm, 3000);
+    return () => ("cancelIdleCallback" in window ? cancelIdleCallback(id) : clearTimeout(id));
+  }, []);
+
   useEffect(() => {
     document.documentElement.style.overflow = introDone ? "" : "hidden";
     const lenis = getLenis();
@@ -134,6 +146,7 @@ export default function App() {
       <main id="main" tabIndex={-1} style={{ outline: "none" }}>
         <AnimatePresence mode="wait">
           <Page key={location.pathname}>
+            <Suspense fallback={<div style={{ minHeight: "100svh" }} />}>
             <Routes location={location}>
               <Route path="/" element={<Home introDone={introDone} />} />
               <Route path="/athlete-recruitment" element={<Recruitment />} />
@@ -143,6 +156,7 @@ export default function App() {
               <Route path="/privacy" element={<Privacy />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </Suspense>
           </Page>
         </AnimatePresence>
       </main>

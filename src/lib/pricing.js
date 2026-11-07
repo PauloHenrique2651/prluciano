@@ -160,3 +160,19 @@ export const RECORD_TIMELINE = [
     ],
   },
 ];
+
+// José Armando's 2025–2026 report card (Grade 5), in the school's order.
+export const JOSE_GRADES = [
+  { subject: "Reading", grade: 91 },
+  { subject: "Grammar", grade: 92 },
+  { subject: "Spelling", grade: 95 },
+  { subject: "Español", grade: 94 },
+  { subject: "Science", grade: 97 },
+  { subject: "Math", grade: 95 },
+  { subject: "Social Studies", grade: 98 },
+  { subject: "Estudios Sociales", grade: 99 },
+  { subject: "Robotics and Technology", grade: 100 },
+  { subject: "Physical Education", grade: 100 },
+  { subject: "Art", grade: 97 },
+  { subject: "Music", grade: 100 },
+];

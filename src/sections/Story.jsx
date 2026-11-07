@@ -147,7 +147,22 @@ export function Education() {
           <p className="body" style={{ marginTop: 24 }}>
             None of it promises a scholarship or admission. It makes the athlete a credible candidate, and then the athlete earns the rest.
           </p>
-          <div className="btn-row" style={{ marginTop: 32 }}>
+          {/* José Armando at a glance; his full interactive profile lives on the recruitment page */}
+          <Reveal className="jose-mini">
+            <p className="jose-mini-name">
+              <b>José Armando Rodríguez Chacón</b>
+              <span>Grade 5, 2025–2026</span>
+            </p>
+            <div className="jose-mini-facts">
+              <span><b className="num"><CountUp from={0} to={97} duration={1.3} /></b>average across 12 subjects</span>
+              <span><b className="num">0</b>absences all year</span>
+              <span><b className="num"><CountUp from={0} to={5} duration={1} /></b>camps and clinics</span>
+            </div>
+            <SmartLink to="/athlete-recruitment#sample-record" className="text-link">
+              See his full profile
+            </SmartLink>
+          </Reveal>
+          <div className="btn-row" style={{ marginTop: 28 }}>
             <SmartLink to="/athlete-recruitment" className="btn btn-ghost">
               See the recruitment program
             </SmartLink>

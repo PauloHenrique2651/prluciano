@@ -4,5 +4,14 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   server: { port: 5173, host: true },
-  build: { target: "es2020", cssCodeSplit: true },
+  build: {
+    target: "es2020",
+    cssCodeSplit: true,
+    rollupOptions: {
+      output: {
+        // libraries change rarely: keep them in their own cached files
+        manualChunks: { react: ["react", "react-dom", "react-router-dom"], motion: ["framer-motion"] },
+      },
+    },
+  },
 });
