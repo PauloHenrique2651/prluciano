@@ -67,12 +67,15 @@ function Page({ children }) {
 export default function App() {
   const location = useLocation();
   const reduce = useReducedMotion();
+  // The opening plays on every fresh load of the home page (desktop and mobile alike).
+  // Navigating between pages inside the site doesn't replay it: this only runs once per load.
   const [introDone, setIntroDone] = useState(() => {
-    try {
-      return sessionStorage.getItem("ee-kickoff") === "1" || location.pathname !== "/";
-    } catch {
-      return true;
+    const play = location.pathname === "/" && !location.hash;
+    if (play) {
+      if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+      window.scrollTo(0, 0);
     }
+    return !play;
   });
 
   useSmoothScroll(true);
@@ -97,9 +100,6 @@ export default function App() {
   }, [location.pathname, location.hash]);
 
   const finishIntro = () => {
-    try {
-      sessionStorage.setItem("ee-kickoff", "1");
-    } catch {}
     setIntroDone(true);
   };
 
