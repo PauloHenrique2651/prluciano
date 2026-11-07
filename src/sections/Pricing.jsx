@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Info, Star, WhatsappLogo, ShieldCheck, Trophy, Plus, ArrowRight, Minus, CaretDown, Tag } from "@phosphor-icons/react";
 import { PLANS, PRICING_TERMS, PRICING_FAQ, PLAN_COMPARE, START_STEPS, planPriceText } from "../lib/pricing.js";
@@ -8,6 +8,60 @@ import { CountUp, RevealLines, Reveal, ScrollIcon, SmartLink, Stagger, EASE } fr
 const applyHref = (key) => `/application-enrollment?program=athlete-recruitment&plan=${key}`;
 const perDay = (p) => ((p.price * 12) / 365).toFixed(2);
 const priceText = planPriceText;
+const ctaClass = (p) => (p.promo ? "cta-night" : p.recommended ? "btn-gold" : "cta-chalk");
+const PROMO = PLANS.find((p) => p.promo);
+
+/** Phones: while the plans are on screen but the offer card's button isn't, keep the offer one tap away. */
+function OfferBar() {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const section = document.getElementById("plans");
+    const stub = document.getElementById("promo-stub");
+    if (!section || !stub || !PROMO) return;
+    let inSection = false;
+    let stubVisible = false;
+    const update = () => {
+      const on = inSection && !stubVisible;
+      setShow(on);
+      document.documentElement.classList.toggle("offer-bar-on", on);
+    };
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.target === section) inSection = e.isIntersecting;
+        else stubVisible = e.isIntersecting;
+      }
+      update();
+    }, { rootMargin: "-20% 0px -10% 0px" });
+    io.observe(section);
+    io.observe(stub);
+    return () => {
+      io.disconnect();
+      document.documentElement.classList.remove("offer-bar-on");
+    };
+  }, []);
+  if (!PROMO) return null;
+  return (
+    <AnimatePresence>
+      {show && (
+        <motion.div
+          className="offer-bar"
+          initial={{ y: 110 }}
+          animate={{ y: 0 }}
+          exit={{ y: 110 }}
+          transition={{ duration: 0.45, ease: EASE }}
+        >
+          <div className="offer-bar-text">
+            <span>{PROMO.short} plan, {PROMO.promo.off}</span>
+            <b><s>US${PROMO.was}</s> US${PROMO.price}/mo</b>
+          </div>
+          <SmartLink to={applyHref(PROMO.key)} className="btn cta-night offer-bar-cta">
+            {PROMO.cta}
+          </SmartLink>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
 
 /** Recruitment plans laid out to convert: outcome-led cards, the recommended plan raised in gold, two ways to act on each. */
 export default function Pricing({ id = "plans" }) {
@@ -42,76 +96,93 @@ export default function Pricing({ id = "plans" }) {
 
         <Stagger className="plan-grid" gap={0.1}>
           {PLANS.map((p, i) => (
-            <Stagger.Item as="article" key={p.key} className={`plan ${p.recommended ? "is-recommended" : ""} ${p.promo ? "has-promo" : ""}`} aria-labelledby={`plan-${p.key}`}>
-              {p.recommended && (
-                <span className="plan-badge">
-                  <Star size={14} weight="fill" aria-hidden="true" /> Recommended
-                </span>
-              )}
-              {p.promo && (
-                <span className="plan-badge plan-badge-promo">
-                  <Tag size={14} weight="fill" aria-hidden="true" /> {p.promo.label}: {p.promo.off}
-                </span>
-              )}
-              <div className="plan-level" role="img" aria-label={`Level ${i + 1} of ${PLANS.length}`}>
-                {PLANS.map((_, s) => (
-                  <motion.span
-                    key={s}
-                    className={s <= i ? "on" : ""}
-                    initial={{ scaleX: 0 }}
-                    whileInView={{ scaleX: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, ease: EASE, delay: 0.3 + s * 0.12 }}
-                  />
-                ))}
-              </div>
-              <p className="plan-outcome">{p.outcome}</p>
-              <h3 id={`plan-${p.key}`} className="plan-name">{p.name}</h3>
-
-              <div className="plan-price-block">
-                {p.was && (
-                  <p className="plan-was">
-                    <s aria-label={`Regular price US$${p.was} a month`}>US${p.was}</s>
-                    <span className="plan-off">{p.promo.off}</span>
-                  </p>
-                )}
-                <p className="plan-price">
-                  {p.price ? (
-                    <>
-                      <span className="plan-currency">US$</span>
-                      <CountUp className="num" from={0} to={p.price} duration={1.4} />
-                      <span className="plan-period">{p.period}</span>
-                    </>
-                  ) : (
-                    <span className="num plan-range">{p.priceLabel}</span>
+            <Stagger.Item
+              as="article"
+              key={p.key}
+              className={`plan ${p.recommended ? "is-recommended" : ""} ${p.promo ? "has-promo" : ""}`}
+              aria-labelledby={`plan-${p.key}`}
+            >
+              <div className="plan-body">
+                <div className="plan-top">
+                  <div className="plan-level" role="img" aria-label={`Level ${i + 1} of ${PLANS.length}`}>
+                    {PLANS.map((_, s) => (
+                      <motion.span
+                        key={s}
+                        className={s <= i ? "on" : ""}
+                        initial={{ scaleX: 0 }}
+                        whileInView={{ scaleX: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, ease: EASE, delay: 0.3 + s * 0.12 }}
+                      />
+                    ))}
+                  </div>
+                  {p.recommended && (
+                    <span className="plan-badge">
+                      <Star size={14} weight="fill" aria-hidden="true" /> Recommended
+                    </span>
                   )}
-                </p>
-                {p.price && <p className="plan-daily">About US${perDay(p)} a day</p>}
-                {(p.note || p.priceSub) && <p className="plan-note">{p.note || p.priceSub}</p>}
+                  {p.promo && (
+                    <span className="plan-badge plan-badge-promo">
+                      <Tag size={14} weight="fill" aria-hidden="true" /> {p.promo.label}
+                    </span>
+                  )}
+                </div>
+
+                <h3 id={`plan-${p.key}`} className="plan-head">
+                  <span className="plan-outcome">{p.outcome}</span>
+                  <span className="plan-name">{p.name}</span>
+                </h3>
+
+                <div className="plan-price-block">
+                  {p.was && (
+                    <p className="plan-was">
+                      <s aria-label={`Regular price US$${p.was} a month`}>US${p.was}</s>
+                      <span className="plan-off">{p.promo.off}</span>
+                    </p>
+                  )}
+                  <p className="plan-price">
+                    {p.price ? (
+                      <>
+                        <span className="plan-currency">US$</span>
+                        <CountUp className="num" from={0} to={p.price} duration={1.4} />
+                        <span className="plan-period">{p.period}</span>
+                      </>
+                    ) : (
+                      <span className="num plan-range">{p.priceLabel}</span>
+                    )}
+                  </p>
+                  {p.price && <p className="plan-daily">About US${perDay(p)} a day</p>}
+                  {(p.note || p.priceSub) && <p className="plan-note">{p.note || p.priceSub}</p>}
+                </div>
+
+                <div className="plan-features">
+                  {p.plus && <p className="plan-plus">{p.plus}</p>}
+                  <ul>
+                    {p.features.map((f) => (
+                      <li key={f}>
+                        <Check size={16} weight="bold" aria-hidden="true" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              <div className="plan-stub" id={p.promo ? "promo-stub" : undefined}>
                 {p.promo && (
                   <p className="plan-code">
-                    Code <b translate="no">{p.promo.code}</b>, applied automatically when you start
+                    <span>Your code</span>
+                    <b translate="no">{p.promo.code}</b>
+                    <span>Applied automatically</span>
                   </p>
                 )}
-              </div>
-
-              <div className="plan-features">
-                {p.plus && <p className="plan-plus">{p.plus}</p>}
-                <ul>
-                  {p.features.map((f) => (
-                    <li key={f}>
-                      <Check size={16} weight="bold" aria-hidden="true" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="plan-actions">
-                <SmartLink to={applyHref(p.key)} className={`btn ${p.recommended ? "btn-gold" : "btn-outline-gold"} plan-cta`}>
-                  {p.promo ? `Claim ${p.promo.off}` : p.recommended ? "Start this plan" : `Choose ${p.short}`}
-                  <ArrowRight size={18} weight="bold" aria-hidden="true" />
+                <SmartLink to={applyHref(p.key)} className={`btn plan-cta ${ctaClass(p)}`}>
+                  <span>{p.cta}</span>
+                  <span className="cta-arrow" aria-hidden="true">
+                    <ArrowRight size={18} weight="bold" />
+                  </span>
                 </SmartLink>
+                <p className="plan-risk">Free first conversation. You only pay once you agree with the plan.</p>
                 <a
                   className="plan-wa"
                   href={waLink(`Hello! I'm interested in the ${p.name} plan, ${priceText(p)}, for my athlete. Could you tell me more?`)}
@@ -119,12 +190,14 @@ export default function Pricing({ id = "plans" }) {
                   rel="noopener noreferrer"
                 >
                   <WhatsappLogo size={18} weight="fill" aria-hidden="true" />
-                  Ask about this plan
+                  Ask about this plan on WhatsApp
                 </a>
               </div>
             </Stagger.Item>
           ))}
         </Stagger>
+
+        <OfferBar />
 
         <PlanCompare />
 
