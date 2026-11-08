@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { GraduationCap, Trophy, Tent, SoccerBall, Flag, Buildings, SortDescending, ListNumbers } from "@phosphor-icons/react";
 import { RECORD_TIMELINE, JOSE_GRADES } from "../lib/pricing.js";
+import VideoCard from "../components/VideoCard.jsx";
 import { Img, RevealLines, Reveal, ScrollIcon, Stagger, CountUp, EASE } from "../components/ui.jsx";
 
 const TAG_ICON = { School: GraduationCap, Tournament: Trophy, Camp: Tent, Clinic: Flag, League: SoccerBall, Academy: Buildings };
@@ -39,6 +40,10 @@ export default function RecordTimeline() {
             />
           </Reveal>
         </div>
+
+        <Reveal className="rt-video-wrap" y={30}>
+          <VideoCard id="SLhQ-wKjOsM" title="José Armando Rodríguez Chacón" />
+        </Reveal>
 
         <Stagger className="jf-facts" gap={0.08}>
           <Stagger.Item className="jf-fact jf-fact-lead">

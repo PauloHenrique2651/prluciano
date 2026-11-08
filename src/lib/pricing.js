@@ -10,9 +10,10 @@ export const PLANS = [
     price: 55,
     was: 115,
     period: "/month",
-    promo: { code: "ETERNAL52", off: "52% off", label: "Launch offer" },
+    promo: { code: "ETERNAL52", off: "52% off", label: "Launch offer for 6 months", months: 6 },
+    note: "US$55 a month for the first 6 months, then US$115",
     text: "Sports profile, résumé and initial guidance.",
-    features: ["Athletic profile", "Academic and athletic résumé", "Initial college guidance"],
+    features: ["Athletic profile", "Academic and athletic résumé", "Social media exposure", "Initial college guidance"],
   },
   {
     key: "college-recruitment",
@@ -60,17 +61,18 @@ export const PLANS = [
   },
 ];
 
-/** Price as written in messages and the application, e.g. "US$55/month (launch code ETERNAL52, regular US$115)". */
+/** Price as written in messages and the application, e.g. "US$55/month for the first 6 months (launch code ETERNAL52), then US$115/month". */
 export function planPriceText(p) {
   if (!p.price) return p.priceLabel;
   const base = `US$${p.price}/month`;
-  return p.promo ? `${base} (launch code ${p.promo.code}, regular US$${p.was})` : base;
+  return p.promo ? `${base} for the first ${p.promo.months} months (launch code ${p.promo.code}), then US$${p.was}/month` : base;
 }
 
 // What each plan includes, for the comparison table. `from` is the first plan (0-3) that includes it.
 export const PLAN_COMPARE = [
   { label: "Athletic profile", from: 0 },
   { label: "Academic and athletic résumé", from: 0 },
+  { label: "Social media exposure", from: 0 },
   { label: "Initial college guidance", from: 0 },
   { label: "Universities matched to the athlete's level", from: 1 },
   { label: "Contact with college coaches and follow-up", from: 1 },

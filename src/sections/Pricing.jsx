@@ -142,7 +142,7 @@ function OfferBar() {
           transition={{ duration: 0.45, ease: EASE }}
         >
           <div className="offer-bar-text">
-            <span>{PROMO.short} plan, {PROMO.promo.off}</span>
+            <span>{PROMO.short} plan, {PROMO.promo.off} for {PROMO.promo.months} months</span>
             <b><s>US${PROMO.was}</s> US${PROMO.price}/mo</b>
           </div>
           <SmartLink to={applyHref(PROMO.key)} className="btn cta-night offer-bar-cta">

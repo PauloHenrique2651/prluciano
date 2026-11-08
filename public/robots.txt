@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://site-eternal.vercel.app/sitemap.xml
+Sitemap: https://eternal11agency.com/sitemap.xml

@@ -238,7 +238,7 @@ export function useSeo({ title, description, path }) {
       set('meta[property="og:description"]', "content", description);
     }
     set('meta[property="og:title"]', "content", title);
-    set('link[rel="canonical"]', "href", `https://site-eternal.vercel.app${path}`);
-    set('meta[property="og:url"]', "content", `https://site-eternal.vercel.app${path}`);
+    set('link[rel="canonical"]', "href", `https://eternal11agency.com${path}`);
+    set('meta[property="og:url"]', "content", `https://eternal11agency.com${path}`);
   }, [title, description, path]);
 }

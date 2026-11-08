@@ -1225,3 +1225,6 @@ html.menu-open .wa-float { visibility: hidden; pointer-events: none; }
 .jose-mini-facts > span { display: grid; gap: 4px; font-size: 13px; line-height: 1.3; color: var(--ink-dim); }
 .jose-mini-facts .num { font-size: 32px; color: var(--gold-deep); }
 .day .jose-mini .text-link { color: var(--gold-deep); justify-self: start; }
+
+.rt-video-wrap { margin-top: clamp(32px, 5vw, 56px); max-width: 1040px; }
+.rt-video-wrap .rt-video { max-width: none; }
