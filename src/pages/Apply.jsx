@@ -3,8 +3,8 @@ import { WhatsappLogo } from "@phosphor-icons/react";
 import ApplicationForm from "../components/ApplicationForm.jsx";
 import { RevealLines, useSeo } from "../components/ui.jsx";
 import { PHONE_DISPLAY, PROGRAM_OPTIONS, waLink } from "../lib/site.js";
-import { PLANS, planPriceText } from "../lib/pricing.js";
-import { Tag } from "@phosphor-icons/react";
+import { AGE_BANDS, PLANS, planFor, planPriceText } from "../lib/pricing.js";
+import { CheckCircle, Tag } from "@phosphor-icons/react";
 
 const STEPS = [
   { name: "You apply", text: "Choose the program and tell us about the athlete. It takes about two minutes." },
@@ -21,8 +21,12 @@ export default function Apply() {
   const [params] = useSearchParams();
   const pre = params.get("program");
   const defaultProgram = PROGRAM_OPTIONS.some((p) => p.value === pre) ? pre : "";
-  const plan = PLANS.find((p) => p.key === params.get("plan"));
+  const band = AGE_BANDS.find((b) => b.key === params.get("age"));
+  const base = PLANS.find((p) => p.key === params.get("plan"));
+  const plan = base ? planFor(base, band?.key) : null;
   const planLabel = plan ? `${plan.name}, ${planPriceText(plan)}` : "";
+  // Back from the checkout (set the Square link's redirect to /application-enrollment?paid=1)
+  const paid = params.get("paid") === "1";
 
   return (
     <section className="page-head" aria-labelledby="apply-title" style={{ paddingBottom: "clamp(88px, 12vw, 160px)" }}>
@@ -49,13 +53,25 @@ export default function Apply() {
           </div>
         </aside>
         <div id="apply-title">
+          {paid && (
+            <p className="apply-plan">
+              <CheckCircle size={18} weight="fill" aria-hidden="true" />
+              Payment received. Tell us about the athlete below so we can start on the record.
+            </p>
+          )}
           {plan && (
             <p className="apply-plan">
               <Tag size={18} weight="fill" aria-hidden="true" />
               Selected plan: <b>{planLabel}</b>
+              {band ? <> · Athlete: {band.label}</> : null}
             </p>
           )}
-          <ApplicationForm variant="full" formName="Application" defaultProgram={defaultProgram} extraFields={{ plan: planLabel }} />
+          <ApplicationForm
+            variant="full"
+            formName="Application"
+            defaultProgram={defaultProgram}
+            extraFields={{ plan: planLabel, "age group": band?.label, payment: paid ? "Paid through Square checkout" : "" }}
+          />
         </div>
       </div>
     </section>

@@ -135,14 +135,15 @@ export function ScrollIcon({ children, spin = 90, className, style }) {
 }
 
 /** Number that counts up when it scrolls into view. */
-export function CountUp({ to, from = 0, duration = 1.6, className }) {
+export function CountUp({ to, from = 0, duration = 1.6, className, decimals = 0, group = false }) {
+  const fmt = (n) => (decimals ? n.toFixed(decimals) : group ? Math.round(n).toLocaleString("en-US") : String(Math.round(n)));
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
   const reduce = useReducedMotion();
   useEffect(() => {
     if (!inView || !ref.current) return;
     if (reduce) {
-      ref.current.textContent = String(to);
+      ref.current.textContent = fmt(to);
       return;
     }
     const start = performance.now();
@@ -150,13 +151,13 @@ export function CountUp({ to, from = 0, duration = 1.6, className }) {
     const tick = (t) => {
       const k = Math.min(1, (t - start) / (duration * 1000));
       const eased = 1 - Math.pow(1 - k, 4);
-      if (ref.current) ref.current.textContent = String(Math.round(from + (to - from) * eased));
+      if (ref.current) ref.current.textContent = fmt(from + (to - from) * eased);
       if (k < 1) raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     // Safety net: if frames are paused (background tab, battery saver), still show the real number.
     const done = setTimeout(() => {
-      if (ref.current) ref.current.textContent = String(to);
+      if (ref.current) ref.current.textContent = fmt(to);
     }, duration * 1000 + 400);
     return () => {
       cancelAnimationFrame(raf);
@@ -164,8 +165,8 @@ export function CountUp({ to, from = 0, duration = 1.6, className }) {
     };
   }, [inView, to, from, duration, reduce]);
   return (
-    <span ref={ref} className={className} aria-label={String(to)}>
-      {reduce ? to : from}
+    <span ref={ref} className={className} aria-label={fmt(to)}>
+      {reduce ? fmt(to) : fmt(from)}
     </span>
   );
 }

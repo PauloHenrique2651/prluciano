@@ -1228,3 +1228,24 @@ html.menu-open .wa-float { visibility: hidden; pointer-events: none; }
 
 .rt-video-wrap { margin-top: clamp(32px, 5vw, 56px); max-width: 1040px; }
 .rt-video-wrap .rt-video { max-width: none; }
+
+/* ======== Age filter and plan actions ======== */
+.age-filter { margin-top: clamp(32px, 4vw, 52px); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 28px; padding: 16px 20px; border: 1px solid var(--line); border-radius: 16px; background: rgba(237, 231, 214, 0.04); }
+.age-filter-text { min-width: 0; flex: 1 1 280px; }
+.age-filter-q { font-family: var(--f-display); font-size: clamp(20px, 1.7vw, 25px); line-height: 1.1; color: var(--chalk); }
+.age-filter-note { margin-top: 6px; font-size: 14.5px; line-height: 1.4; color: var(--chalk-dim); }
+.age-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.age-chip { position: relative; isolation: isolate; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid rgba(237, 231, 214, 0.28); color: var(--chalk); font-size: 15px; font-weight: 600; transition: color 0.25s, border-color 0.25s; }
+.age-chip:hover { border-color: var(--gold-hi); }
+.age-chip.is-on { color: var(--night); border-color: var(--gold); }
+.age-chip-bg { position: absolute; inset: -1px; z-index: -1; border-radius: 999px; background: var(--gold); }
+.age-chip-text { display: inline-flex; align-items: center; gap: 8px; }
+.age-chip-text small { padding: 2px 7px; border-radius: 999px; background: rgba(201, 160, 74, 0.22); color: var(--gold-hi); font-size: 12px; font-weight: 700; }
+.age-chip.is-on .age-chip-text small { background: rgba(6, 16, 11, 0.16); color: var(--night); }
+.age-filter + .plan-grid { margin-top: clamp(20px, 2.4vw, 32px); }
+@media (max-width: 560px) { .age-filter { padding: 14px; } .age-chip { flex: 1 1 auto; justify-content: center; padding: 0 12px; } }
+
+.plan-alt { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0 16px; }
+.plan-alt .plan-wa { min-height: 40px; font-size: 14px; }
+.plan-alt a.plan-wa:first-child:not(:last-child) { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(237, 231, 214, 0.35); }
+.plan.has-promo .plan-alt a.plan-wa { color: var(--night); }

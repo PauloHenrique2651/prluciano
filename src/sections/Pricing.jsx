@@ -1,22 +1,21 @@
-import { useEffect, useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { AnimatePresence, animate, motion, useMotionValue, useMotionValueEvent, useSpring, useTransform } from "framer-motion";
 import { IS_TOUCH } from "../lib/device.js";
 import { useNavigate } from "react-router-dom";
 import { Check, Info, Star, WhatsappLogo, ShieldCheck, Trophy, Plus, ArrowRight, Minus, CaretDown, Tag, Scissors } from "@phosphor-icons/react";
-import { PLANS, PRICING_TERMS, PRICING_FAQ, PLAN_COMPARE, START_STEPS, planPriceText } from "../lib/pricing.js";
+import { PLANS, AGE_BANDS, YOUTH_BAND, PRICING_TERMS, PRICING_FAQ, PLAN_COMPARE, START_STEPS, planFor, planPriceText, money } from "../lib/pricing.js";
 import { waLink } from "../lib/site.js";
 import { CountUp, RevealLines, Reveal, ScrollIcon, SmartLink, Stagger, EASE } from "../components/ui.jsx";
 
-const applyHref = (key) => `/application-enrollment?program=athlete-recruitment&plan=${key}`;
-const perDay = (p) => ((p.price * 12) / 365).toFixed(2);
+const applyHref = (key, band) => `/application-enrollment?program=athlete-recruitment&plan=${key}${band ? `&age=${encodeURIComponent(band)}` : ""}`;
+const perDay = (p) => ((p.period === "/year" ? p.price : p.price * 12) / 365).toFixed(2);
 const priceText = planPriceText;
 const ctaClass = (p) => (p.promo ? "cta-night" : p.recommended ? "btn-gold" : "cta-chalk");
-const PROMO = PLANS.find((p) => p.promo);
-const CUT_EASE = [0.65, 0, 0.35, 1];
+const YOUTH_PLAN = PLANS.find((p) => p.youth);
 
 /** Perforation the visitor cuts with a finger or the mouse. The scissors follow on a spring;
  *  pressing anywhere on the perforation and sliding cuts it. Tap / Enter on the scissors cuts it in one go. */
-function TicketCut({ progress, onCut }) {
+function TicketCut({ progress, onCut, verb = "apply" }) {
   const track = useRef(null);
   const [touched, setTouched] = useState(false);
   const [done, setDone] = useState(false);
@@ -75,13 +74,13 @@ function TicketCut({ progress, onCut }) {
       <motion.span className="tcut-line" style={{ scaleX: progress }} aria-hidden="true" />
       {!done && (
         <motion.span className="tcut-hint" style={{ opacity: hint }} aria-hidden="true">
-          {IS_TOUCH ? "Slide to cut and apply" : "Drag to cut and apply"}
+          {IS_TOUCH ? `Slide to cut and ${verb}` : `Drag to cut and ${verb}`}
         </motion.span>
       )}
       <motion.button
         type="button"
         className="tcut-scissors"
-        aria-label="Cut the ticket and open the application"
+        aria-label={verb === "pay" ? "Cut the ticket and open the secure checkout" : "Cut the ticket and open the application"}
         disabled={done}
         style={{ x }}
         onClick={() => {
@@ -102,72 +101,68 @@ function TicketCut({ progress, onCut }) {
   );
 }
 
-/** Phones: while the plans are on screen but the offer card's button isn't, keep the offer one tap away. */
-function OfferBar() {
-  const [show, setShow] = useState(false);
-  useEffect(() => {
-    const section = document.getElementById("plans");
-    const stub = document.getElementById("promo-stub");
-    if (!section || !stub || !PROMO) return;
-    let inSection = false;
-    let stubVisible = false;
-    const update = () => {
-      const on = inSection && !stubVisible;
-      setShow(on);
-      document.documentElement.classList.toggle("offer-bar-on", on);
-    };
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (e.target === section) inSection = e.isIntersecting;
-        else stubVisible = e.isIntersecting;
-      }
-      update();
-    }, { rootMargin: "-20% 0px -10% 0px" });
-    io.observe(section);
-    io.observe(stub);
-    return () => {
-      io.disconnect();
-      document.documentElement.classList.remove("offer-bar-on");
-    };
-  }, []);
-  if (!PROMO) return null;
+/** Athlete's age: one tap changes the prices below. Nothing is selected at first, so the regular prices show. */
+function AgeFilter({ band, onChange }) {
+  const pill = useId();
+  const youth = YOUTH_PLAN?.youth;
   return (
-    <AnimatePresence>
-      {show && (
-        <motion.div
-          className="offer-bar"
-          initial={{ y: 110 }}
-          animate={{ y: 0 }}
-          exit={{ y: 110 }}
-          transition={{ duration: 0.45, ease: EASE }}
-        >
-          <div className="offer-bar-text">
-            <span>{PROMO.short} plan, {PROMO.promo.off} for {PROMO.promo.months} months</span>
-            <b><s>US${PROMO.was}</s> US${PROMO.price}/mo</b>
-          </div>
-          <SmartLink to={applyHref(PROMO.key)} className="btn cta-night offer-bar-cta">
-            {PROMO.cta}
-          </SmartLink>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <div className="age-filter">
+      <div className="age-filter-text">
+        <p className="age-filter-q" id="age-filter-label">How old is the athlete?</p>
+        <p className="age-filter-note" aria-live="polite">
+          {band === YOUTH_BAND
+            ? `${youth.off}% off ${YOUTH_PLAN.short} for athletes 13 and under. The price below has changed.`
+            : youth
+              ? `Athletes 13 and under get ${youth.off}% off ${YOUTH_PLAN.short}.`
+              : "Pick an age to see the price that applies."}
+        </p>
+      </div>
+      <div className="age-chips" role="radiogroup" aria-labelledby="age-filter-label">
+        {AGE_BANDS.map((b) => {
+          const on = band === b.key;
+          return (
+            <button
+              key={b.key}
+              type="button"
+              role="radio"
+              aria-checked={on}
+              className={`age-chip ${on ? "is-on" : ""}`}
+              onClick={() => onChange(on ? null : b.key)}
+            >
+              {on && <motion.span layoutId={`age-pill-${pill}`} className="age-chip-bg" transition={{ duration: 0.4, ease: EASE }} />}
+              <span className="age-chip-text">
+                {b.short}
+                {b.key === YOUTH_BAND && youth && <small>{youth.off}% off</small>}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
 /** The plan tickets, shared by the home page and the recruitment page.
- *  Cutting a ticket splits it in two, then opens the application with that plan already chosen. */
-export function PlanGrid({ markPromo = false }) {
+ *  An age filter sets the price; the button opens the secure checkout, and cutting the ticket does the same. */
+export function PlanGrid() {
+  const [band, setBand] = useState(null);
   return (
-    <Stagger className="plan-grid" gap={0.1}>
-      {PLANS.map((p, i) => (
-        <PlanCard key={p.key} p={p} i={i} markPromo={markPromo} />
-      ))}
-    </Stagger>
+    <>
+      <AgeFilter band={band} onChange={setBand} />
+      <Stagger className="plan-grid" gap={0.1}>
+        {PLANS.map((p, i) => (
+          <PlanCard key={p.key} base={p} band={band} i={i} />
+        ))}
+      </Stagger>
+    </>
   );
 }
 
 /** One plan ticket in two pieces: the body and the stub, joined by the perforation. */
-function PlanCard({ p, i, markPromo }) {
+function PlanCard({ base, band, i }) {
+  const p = planFor(base, band);
+  // The checkout link at this price, or the application when there is none yet (young-athlete price before its link exists).
+  const payUrl = p.pay || null;
   const navigate = useNavigate();
   const [torn, setTorn] = useState(false);
   const cut = useMotionValue(0); // 0 → 1 while cutting
@@ -182,7 +177,10 @@ function PlanCard({ p, i, markPromo }) {
   const tear = () => {
     setTorn(true);
     animate(split, 1, { type: "spring", stiffness: 110, damping: 13, mass: 0.9 });
-    setTimeout(() => navigate(applyHref(p.key) + "#apply-title"), 1150);
+    setTimeout(() => {
+      if (payUrl) window.location.assign(payUrl);
+      else navigate(applyHref(p.key, band) + "#apply-title");
+    }, 1150);
   };
 
   return (
@@ -230,7 +228,7 @@ function PlanCard({ p, i, markPromo }) {
             <div className="plan-price-block">
               {p.was && (
                 <p className="plan-was">
-                  <s aria-label={`Regular price US$${p.was} a month`}>US${p.was}</s>
+                  <s aria-label={`Regular price US$${money(p.was)} a month`}>US${money(p.was)}</s>
                   <span className="plan-off">{p.promo.off}</span>
                 </p>
               )}
@@ -238,7 +236,7 @@ function PlanCard({ p, i, markPromo }) {
                 {p.price ? (
                   <>
                     <span className="plan-currency">US$</span>
-                    <CountUp className="num" from={0} to={p.price} duration={1.4} />
+                    <CountUp className="num" from={0} to={p.price} duration={1.1} decimals={Number.isInteger(p.price) ? 0 : 2} group />
                     <span className="plan-period">{p.period}</span>
                   </>
                 ) : (
@@ -263,10 +261,10 @@ function PlanCard({ p, i, markPromo }) {
           </motion.div>
 
           <div className="plan-seam">
-            <TicketCut progress={cut} onCut={tear} />
+            <TicketCut progress={cut} onCut={tear} verb={payUrl ? "pay" : "apply"} />
           </div>
 
-          <motion.div className="plan-stub" id={p.promo && markPromo ? "promo-stub" : undefined} style={{ x: stubX, y: stubY, rotate: stubR }}>
+          <motion.div className="plan-stub" style={{ x: stubX, y: stubY, rotate: stubR }}>
             {p.promo && (
               <p className="plan-code">
                 <span>Your code</span>
@@ -274,22 +272,40 @@ function PlanCard({ p, i, markPromo }) {
                 <span>Applied automatically</span>
               </p>
             )}
-            <SmartLink to={applyHref(p.key)} className={`btn plan-cta ${ctaClass(p)}`}>
-              <span>{p.cta}</span>
-              <span className="cta-arrow" aria-hidden="true">
-                <ArrowRight size={18} weight="bold" />
-              </span>
-            </SmartLink>
-            <p className="plan-risk">Free first conversation. You only pay once you agree with the plan.</p>
-            <a
-              className="plan-wa"
-              href={waLink(`Hello! I'm interested in the ${p.name} plan, ${priceText(p)}, for my athlete. Could you tell me more?`)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <WhatsappLogo size={18} weight="fill" aria-hidden="true" />
-              Ask about this plan on WhatsApp
-            </a>
+            {payUrl ? (
+              <a href={payUrl} className={`btn plan-cta ${ctaClass(p)}`}>
+                <span>{p.cta}</span>
+                <span className="cta-arrow" aria-hidden="true">
+                  <ArrowRight size={18} weight="bold" />
+                </span>
+              </a>
+            ) : (
+              <SmartLink to={applyHref(p.key, band)} className={`btn plan-cta ${ctaClass(p)}`}>
+                <span>{p.cta}</span>
+                <span className="cta-arrow" aria-hidden="true">
+                  <ArrowRight size={18} weight="bold" />
+                </span>
+              </SmartLink>
+            )}
+            <p className="plan-risk">
+              {payUrl ? "Secure checkout by Square. After paying, we ask for the athlete's details." : "Apply and we send your secure checkout link at this price."}
+            </p>
+            <div className="plan-alt">
+              {payUrl && (
+                <SmartLink to={applyHref(p.key, band)} className="plan-wa">
+                  Apply first
+                </SmartLink>
+              )}
+              <a
+                className="plan-wa"
+                href={waLink(`Hello! I'm interested in the ${p.name} plan, ${priceText(p)}, for my athlete. Could you tell me more?`)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <WhatsappLogo size={18} weight="fill" aria-hidden="true" />
+                Ask on WhatsApp
+              </a>
+            </div>
             <div className="plan-barcode" aria-hidden="true">
               <span />
               <small>Valid for one student-athlete</small>
@@ -326,13 +342,11 @@ export default function Pricing({ id = "plans" }) {
           </Stagger.Item>
           <Stagger.Item className="trust-item">
             <ScrollIcon spin={90}><ShieldCheck size={22} weight="fill" aria-hidden="true" /></ScrollIcon>
-            Nothing is paid before we explain what your plan involves
+            Secure checkout by Square, or apply first with no commitment
           </Stagger.Item>
         </Stagger>
 
-        <PlanGrid markPromo />
-
-        <OfferBar />
+        <PlanGrid />
 
         <PlanCompare />
 
@@ -408,8 +422,7 @@ function PlanCompare() {
                   {PLANS.map((p) => (
                     <th scope="col" key={p.key} className={p.recommended ? "is-rec" : ""}>
                       <span className="compare-name">{p.short === "College Recruitment" ? "College" : p.short}</span>
-                      <span className="compare-price">{p.price ? `$${p.price}/mo` : "$1.5–3k"}</span>
-                      {p.was && <s className="compare-was">${p.was}</s>}
+                      <span className="compare-price">{p.period === "/year" ? `$${money(p.price)}/yr` : `$${p.price}/mo`}</span>
                     </th>
                   ))}
                 </tr>
@@ -481,7 +494,7 @@ export function PlanStrip() {
         <div className="plan-strip-head">
           <div>
             <p className="kicker">College recruitment plans</p>
-            <h2 className="display d-m" style={{ marginTop: 14 }}>From US$55 a month.</h2>
+            <h2 className="display d-m" style={{ marginTop: 14 }}>From US$115 a month.</h2>
           </div>
           <SmartLink to="/athlete-recruitment#plans" className="btn btn-outline-gold">
             Compare all plans

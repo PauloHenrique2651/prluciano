@@ -5,13 +5,15 @@ export const PLANS = [
     key: "basic",
     name: "Basic College Pathway",
     short: "Basic",
-    cta: "Claim 52% off",
+    cta: "Start Basic",
     outcome: "Get the athlete's record ready",
-    price: 55,
-    was: 115,
+    price: 115,
     period: "/month",
-    promo: { code: "ETERNAL52", off: "52% off", label: "Launch offer for 6 months", months: 6 },
-    note: "US$55 a month for the first 6 months, then US$115",
+    // Square checkout link (subscription, US$115/month).
+    pay: "https://square.link/u/OemCXOtw",
+    // Young-athlete offer: 45% off for athletes 13 and under. Square has no discount-code field, so this needs its own
+    // checkout link at the discounted price. Paste it into `pay` below once it exists; until then the button opens the application.
+    youth: { off: 45, code: "ETERNAL45", label: "Young athlete offer", cta: "Claim 45% off", pay: null },
     text: "Sports profile, résumé and initial guidance.",
     features: ["Athletic profile", "Academic and athletic résumé", "Social media exposure", "Initial college guidance"],
   },
@@ -23,6 +25,7 @@ export const PLANS = [
     outcome: "Get in front of college coaches",
     price: 195,
     period: "/month",
+    pay: "https://square.link/u/qv3nDSs4",
     recommended: true,
     text: "University search, contact with coaches, follow-up and a recommendation letter.",
     note: "6-month initial term · US$1,170 total",
@@ -43,6 +46,7 @@ export const PLANS = [
     outcome: "Go after scholarships",
     price: 295,
     period: "/month",
+    pay: "https://square.link/u/8YKGgk3r",
     text: "Full guidance, applications and scholarship search.",
     plus: "Everything in College Recruitment, plus",
     features: ["Full guidance through the process", "Help preparing university applications", "Academic and athletic scholarship search"],
@@ -51,21 +55,47 @@ export const PLANS = [
     key: "full-recruitment",
     name: "Full Recruitment",
     short: "Full",
-    cta: "Get a quote",
+    cta: "Start Full plan",
     outcome: "Hand us the whole process",
-    priceLabel: "US$1,500–3,000",
-    priceSub: "based on the scope of the process",
+    price: 3000,
+    period: "/year",
+    pay: "https://square.link/u/0SaZehUb",
+    note: "Lighter scope? Ask for a quote, from US$1,500",
     text: "Personalized support throughout the entire process.",
     plus: "Everything in Premium, with",
     features: ["Personalized one-to-one support", "Accompaniment from first contact to decision"],
   },
 ];
 
-/** Price as written in messages and the application, e.g. "US$55/month for the first 6 months (launch code ETERNAL52), then US$115/month". */
+/** Age bands for the plan filter. Only the first one changes a price today (see `youth` on a plan). */
+export const YOUTH_BAND = "u13";
+export const AGE_BANDS = [
+  { key: "u13", label: "13 and under", short: "Up to 13" },
+  { key: "14-17", label: "14 to 17", short: "14 to 17" },
+  { key: "18+", label: "18 and over", short: "18 and over" },
+];
+
+/** 63.25 stays 63.25, 115 stays 115. */
+export const money = (n) => (Number.isInteger(n) ? n.toLocaleString("en-US") : n.toFixed(2));
+
+/** The plan as it applies to an athlete's age band: the young-athlete offer swaps in its price, code and checkout link. */
+export function planFor(p, band) {
+  const y = p.youth && band === YOUTH_BAND ? p.youth : null;
+  if (!y) return p;
+  return {
+    ...p,
+    price: Math.round(p.price * (100 - y.off)) / 100,
+    was: p.price,
+    promo: { code: y.code, off: `${y.off}% off`, label: y.label },
+    cta: y.cta,
+    pay: y.pay,
+  };
+}
+
+/** Price as written in messages and the application, e.g. "US$63.25/month (45% off, code ETERNAL45, regular US$115)". */
 export function planPriceText(p) {
-  if (!p.price) return p.priceLabel;
-  const base = `US$${p.price}/month`;
-  return p.promo ? `${base} for the first ${p.promo.months} months (launch code ${p.promo.code}), then US$${p.was}/month` : base;
+  const base = `US$${money(p.price)}${p.period === "/year" ? "/year" : "/month"}`;
+  return p.promo ? `${base} (${p.promo.off}, code ${p.promo.code}, regular US$${money(p.was)})` : base;
 }
 
 // What each plan includes, for the comparison table. `from` is the first plan (0-3) that includes it.
@@ -120,7 +150,7 @@ export const PRICING_FAQ = [
   },
   {
     q: "When do we pay?",
-    a: "After we read your application and explain what the plan involves for your athlete. Nothing is paid before that.",
+    a: "Pick a plan and pay securely through Square; we then ask for the athlete's details and start on the record. Not sure which plan fits? Send the application first and we'll recommend one. Nothing is paid until you agree with it.",
   },
 ];
 
