@@ -1249,3 +1249,9 @@ html.menu-open .wa-float { visibility: hidden; pointer-events: none; }
 .plan-alt .plan-wa { min-height: 40px; font-size: 14px; }
 .plan-alt a.plan-wa:first-child:not(:last-child) { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(237, 231, 214, 0.35); }
 .plan.has-promo .plan-alt a.plan-wa { color: var(--night); }
+
+/* Tickets line up: the recommended plan is marked in gold, not raised, so every perforation and button sits on the same line. */
+@media (min-width: 1280px) { .plan.is-recommended, .plan.is-recommended:hover { top: 0; } }
+.plan-cta { white-space: normal; min-width: 0; }
+.plan-cta > span:first-child { min-width: 0; overflow-wrap: anywhere; line-height: 1.15; }
+.plan-risk { min-height: 3.9em; display: flex; align-items: center; justify-content: center; }
