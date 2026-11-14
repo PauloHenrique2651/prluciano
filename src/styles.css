@@ -1255,3 +1255,8 @@ html.menu-open .wa-float { visibility: hidden; pointer-events: none; }
 .plan-cta { white-space: normal; min-width: 0; }
 .plan-cta > span:first-child { min-width: 0; overflow-wrap: anywhere; line-height: 1.15; }
 .plan-risk { min-height: 3.9em; display: flex; align-items: center; justify-content: center; }
+
+/* Sponsor logos: each one sits centred inside its card and scales down to fit, whatever the screen width. */
+.sponsor { position: relative; overflow: hidden; min-width: 0; aspect-ratio: 16 / 10; }
+.sponsor img { position: absolute; inset: clamp(20px, 4vw, 48px); width: calc(100% - 2 * clamp(20px, 4vw, 48px)); height: calc(100% - 2 * clamp(20px, 4vw, 48px)); max-height: none; object-fit: contain; object-position: center; }
+@media (max-width: 640px) { .sponsor { aspect-ratio: 4 / 3; } }
