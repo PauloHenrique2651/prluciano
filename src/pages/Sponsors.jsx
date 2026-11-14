@@ -1,8 +1,45 @@
-import { motion } from "framer-motion";
-import { Img, RevealLines, SmartLink, useSeo, EASE } from "../components/ui.jsx";
+import { useRef } from "react";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
+import { Img, RevealLines, SmartLink, useSeo } from "../components/ui.jsx";
 import { waLink } from "../lib/site.js";
+import { IS_TOUCH } from "../lib/device.js";
 
 const SPONSORS = ["sponsor-1", "sponsor-2", "sponsor-3", "sponsor-4"];
+
+/** One sponsor card, driven by the scroll like the site's photos: the card opens as it enters,
+ *  the logo settles into place and drifts against the scroll, and a gold sheen crosses it once. */
+function SponsorCard({ name, i }) {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const p = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.4 });
+  const { scrollYProgress: enter } = useScroll({ target: ref, offset: ["start end", "start 80%"] });
+  const e = useSpring(enter, { stiffness: 140, damping: 30, mass: 0.4 });
+
+  // The card opens like a shutter (desktop) or grows into place (phones: transform only, cheaper to paint).
+  const clip = useTransform(e, [0, 1], ["inset(14% 8% 14% 8% round 28px)", "inset(0% 0% 0% 0% round 14px)"]);
+  const cardScale = useTransform(e, [0, 1], [0.88, 1]);
+  const tilt = useTransform(e, [0, 1], [12, 0]);
+  // The logo grows into place, then drifts against the scroll. The two columns drift in opposite directions.
+  const dir = i % 2 ? -1 : 1;
+  const logoY = useTransform(p, [0, 1], [34 * dir, -34 * dir]);
+  const logoScale = useTransform(p, [0, 0.42, 1], [0.78, 1, 0.94]);
+  const logoOpacity = useTransform(e, [0, 0.6], [0, 1]);
+  // Gold sheen crossing the card as it reaches the middle of the screen.
+  const sheen = useTransform(p, [0.25, 0.65], ["-130%", "130%"]);
+
+  return (
+    <motion.div
+      ref={ref}
+      className="sponsor"
+      style={IS_TOUCH ? { scale: cardScale } : { clipPath: clip, rotateX: tilt, transformPerspective: 1200 }}
+    >
+      <motion.div className="sponsor-logo" style={{ y: logoY, scale: logoScale, opacity: logoOpacity }}>
+        <Img name={name} alt="Official sponsor logo" sizes="(max-width: 640px) 80vw, 40vw" />
+      </motion.div>
+      <motion.span className="sponsor-sheen" style={{ x: sheen }} aria-hidden="true" />
+    </motion.div>
+  );
+}
 
 export default function Sponsors() {
   useSeo({
@@ -25,16 +62,7 @@ export default function Sponsors() {
         <div className="wrap">
           <div className="sponsor-grid" style={{ marginTop: 0 }}>
             {SPONSORS.map((s, i) => (
-              <motion.div
-                key={s}
-                className="sponsor"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-                transition={{ duration: 0.8, ease: EASE, delay: i * 0.07 }}
-              >
-                <Img name={s} alt="Official sponsor logo" sizes="(max-width: 640px) 80vw, 40vw" />
-              </motion.div>
+              <SponsorCard key={s} name={s} i={i} />
             ))}
           </div>
         </div>
